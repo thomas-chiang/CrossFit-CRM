@@ -97,11 +97,11 @@ const getCourseEnrolledmembers = async (course_id) => {
     select 
       users.id,
       users.name,
-      course_user.enrollment
+      course_user.enrollment,
+      course_user.checkout
     from course_user
     left join users on course_user.user_id = users.id
     where course_user.enrollment is not null
-    and course_user.checkout = 0
     and course_user.course_id = ?
   `,[course_id])
 
