@@ -15,7 +15,7 @@ router.route('/workout/workoutmovement/').put(authenticate('member'), wrapAsync(
 router.route('/workout/workoutmovement/:workout_movement_id').delete(authenticate('member'), wrapAsync(Workout.deleteWorkoutMovement))
 router.route('/workout/workout/:workout_id').get(wrapAsync(Workout.getWorkout));
 router.route('/workout/addmovement').post(authenticate('member'),wrapAsync(Workout.addWorkoutMovement));
-router.route('/workout/onlyworkout').put(authenticate('member'),wrapAsync(Workout.updateOnlyWorkout));
+router.route('/workout/onlynameandnote').put(authenticate('member'),wrapAsync(Workout.updateOnlyNameAndNote));
 router.route('/workout/workout/:workout_id').delete(authenticate('member'),wrapAsync(Workout.deleteWorkout));
 router.route('/workout/workoutmovements/:workout_id').get(wrapAsync(Workout.getWorkoutMovements));
 

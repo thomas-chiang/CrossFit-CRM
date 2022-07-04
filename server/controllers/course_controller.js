@@ -80,12 +80,13 @@ const enroll = async (req, res) => {
 const createCourse = async (req, res) => {
   const course = req.body
   if(Date.parse(course.start) >= Date.parse(course.end)) return res.status(400).json({error:'start time must be earilier than end time'})
-
+  if(!course.start || !course.end || !course.title || !course.point || course.point <= 0 || !course.size || course.size <= 0) 
+    return res.status(400).json({error: 'Course must have start time, end time, point(>0), size(>0), title'})
+  
   course.creator_id = req.user.id
 
   let coaches = course.coaches ? course.coaches : []
   let members = course.members ? course.members : []
-  // let participants = coaches.concat(members)
 
   let workouts = course.workouts ? course.workouts : []
 
@@ -101,13 +102,13 @@ const createCourse = async (req, res) => {
 const updateCourse = async (req, res) => {
   const course = req.body
   if(Date.parse(course.start) >= Date.parse(course.end)) return res.status(400).json({error:'start time must be earilier than end time'})
+  if(!course.start || !course.end || !course.title || !course.point || course.point <= 0 || !course.size || course.size <= 0) 
+    return res.status(400).json({error: 'Course must have start time, end time, point(>0), size(>0), title'})
 
   let user = req.user
   course.creator_id = user.id
 
   let coaches = course.coaches ? course.coaches : []
-  let members = course.members ? course.members : []
-  let participants = coaches.concat(members)
 
   let workouts = course.workouts ? course.workouts : []
 
@@ -148,9 +149,10 @@ const getCourses = async (req, res) => {
       for (let member of members) {
         if(member.enrollment >= 1) enrolledMembers.push(member)
       }
+      
       course.size_enrolled = enrolledMembers.length
       course.coaches = coaches
-    }
+    } else course.size_enrolled = 0
     
 
     if (course.workouts) {

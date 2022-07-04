@@ -6,10 +6,11 @@ const getWorkoutMovements = async (req, res) => {
   res.json(result)
 }
 
-const updateOnlyWorkout = async(req, res) => {
+const updateOnlyNameAndNote = async(req, res) => {
   let updatedWorkout = req.body
+  if(!updatedWorkout.name) return res.status(400).json({error: 'Workout name cannot be emtpy'})
   delete updatedWorkout.movements
-  let result = await Workout.updateOnlyWorkout(updatedWorkout)
+  let result = await Workout.updateOnlyNameAndNote(updatedWorkout)
   res.json(result)
 }
 
@@ -48,6 +49,7 @@ const getWorkoutMovement = async (req, res) => {
 
 const createWorkoutWithMovement = async (req, res) => {
   const workout = req.body
+  if(!workout.name) return res.status(400).json({error:'Workout name cannot be empty'})
   let user = req.user
   workout.creator_id = user.id
   let result = await Workout.createWorkoutWithMovement(workout)
@@ -128,6 +130,6 @@ module.exports = {
   deleteWorkoutMovement,
   getWorkout,
   addWorkoutMovement,
-  updateOnlyWorkout,
+  updateOnlyNameAndNote,
   getWorkoutMovements
 }

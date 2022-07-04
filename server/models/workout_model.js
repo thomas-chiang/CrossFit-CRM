@@ -12,7 +12,7 @@ const getWorkoutMovements = async (workout_id) => {
   return result;
 }
 
-const updateOnlyWorkout = async (updatedWorkout) => {
+const updateOnlyNameAndNote = async (updatedWorkout) => {
   const [result] = await pool.query(
     `
       UPDATE workouts 
@@ -345,6 +345,6 @@ module.exports = {
   deleteWorkoutMovement,
   getWorkout,
   addWorkoutMovement,
-  updateOnlyWorkout,
+  updateOnlyNameAndNote,
   getWorkoutMovements
 }
