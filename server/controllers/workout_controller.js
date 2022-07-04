@@ -93,9 +93,7 @@ const deleteWorkout = async (req, res) => {
 
 const getWorkoutsWithMovements = async (req, res) => {
   let obj = await Workout.getWorkoutsWithMovements()
-
   let arr = Object.keys(obj).map(workout_id => obj[workout_id])
-
   res.json(arr)
 }
 
@@ -104,7 +102,6 @@ const getOwnedWorkoutsWithMovements = async (req, res) => {
   let obj = await Workout.getOwnedWorkoutsWithMovements(user)
 
   let arr = Object.keys(obj).map(workout_id => obj[workout_id])
-
   res.json(arr)
 }
 

@@ -1,6 +1,7 @@
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const {TOKEN_SECRET} = process.env; // 30 days by seconds
+const User = require('../server/models/user_model');
 
 
 // reference: https://thecodebarbarian.com/80-20-guide-to-express-error-handling
@@ -35,7 +36,27 @@ const authenticate = (role) => {
     };
 };
 
+const isValid = () => {
+    return async function (req, res, next) {
+        try {
+            let user = req.user
+            let user_id = user.id
+            let role = user.role
+            let status = await User.getVaidStatus(user_id)
+            //console.log(status) 
+            //let status = user.valid
+            if (status === 1) next()
+            else if (status !== 1 && role === 3) return res.status(400).send({error: 'Please reach out to Crossfit CRM to validate your gym owner identity'})
+            else throw new Error
+               
+        } catch(err) {
+            return res.status(400).send({error: 'Please reach out to gym owner to validate your account'})
+        }
+    };
+};
+
 module.exports = {
     wrapAsync,
-    authenticate
+    authenticate,
+    isValid
 };

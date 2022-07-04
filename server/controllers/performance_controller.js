@@ -1,5 +1,12 @@
 const Performance = require('../models/performance_model')
 
+const getPerformanceByMovement = async (req, res) => {
+  let user_id = req.query.user_id
+  let movement_id = req.query.movement_id
+  let result = await Performance.getPerformanceByUserMovement(user_id, movement_id)
+  res.json(result)
+}
+
 const getPerformanceByUserMovement = async (req, res) => {
   let user_id = req.user.id
   let movement_id = req.params.movement_id
@@ -45,5 +52,6 @@ module.exports = {
   deletePerformance,
   updatePerformance,
   getPerformanceWithMovementWorkoutName,
-  getPerformanceByUserMovement
+  getPerformanceByUserMovement,
+  getPerformanceByMovement
 }

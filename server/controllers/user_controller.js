@@ -102,6 +102,42 @@ const deleteUserByGym = async (req, res) => {
   res.status(200).json(result)
 }
 
+const getValidCoaches = async (req, res) => {
+  let coaches = await User.getValidCoaches()
+  for (let coach of coaches) {
+    coach.label = coach.name
+    coach.value = coach.id
+  }
+
+  res.status(200).json(coaches)
+}
+
+const getCoaches = async (req, res) => {
+  let coaches = await User.getCoaches()
+  for (let coach of coaches) {
+    coach.label = coach.name
+    coach.value = coach.id
+  }
+
+  res.status(200).json(coaches)
+}
+
+const updateValidStatus = async (req, res) => {
+  let user_id = req.query.user_id
+  let valid_status = req.query.valid_status
+  let result = await User.updateValidStatus(user_id, valid_status)
+
+  res.status(200).json(result)
+}
+
+const updatePoint = async (req, res) => {
+  let user_id = req.query.user_id
+  let point = req.query.point
+  let result = await User.updatePoint(user_id, point)
+
+  res.status(200).json(result)
+}
+
 module.exports = {
   signUp,
   signIn,
@@ -109,5 +145,9 @@ module.exports = {
   getUsersByRole,
   addUserToGymbyEmail,
   getUsersByGymAndRole,
-  deleteUserByGym
+  deleteUserByGym,
+  getValidCoaches,
+  getCoaches,
+  updateValidStatus,
+  updatePoint
 };

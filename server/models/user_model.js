@@ -28,7 +28,7 @@ const getUserProfile = async (role, email) => {
 
 
 const getUsersByRole = async (role) => {
-  const [users] = await pool.query('select id, name from users where role = ? ', [ role ]);
+  const [users] = await pool.query('select * from users where role = ? ', [ role ]);
   return users
 }
 
@@ -63,7 +63,7 @@ const getUsersByGymAndRole = async (gym_id, role) => {
   const [users] = await pool.query(`
     select users.id, users.name, users.email, users.role 
     from user_gym
-    inner join users
+    left join users
     on user_gym.user_id = users.id
     where user_gym.gym_id = ? 
     and users.role = ?
@@ -93,6 +93,53 @@ const getGymsByUser = async (user) => {
   return gyms
 }
 
+const getValidCoaches = async () => {
+  const [coaches] = await pool.query(`
+    select id, name from users 
+    where role = 2
+    and valid = 1
+  `)
+
+  return coaches
+}
+
+const getCoaches = async () => {
+  const [coaches] = await pool.query(`
+    select * from users 
+    where role = 2
+  `)
+
+  return coaches
+}
+
+const updateValidStatus = async (user_id, valid_status) => {
+  let [result] = await pool.query(`
+    update users
+    set valid = ? 
+    where id = ?
+  `,[valid_status, user_id])
+
+  return result
+}
+
+const getVaidStatus = async (user_id) => {
+  let [result] = await pool.query(`
+    select * from users where id = ?
+  `,[user_id])
+
+  return result[0].valid
+}
+
+const updatePoint = async (user_id, point) => {
+  let [result] = await pool.query(`
+    update users
+    set point = ? 
+    where id = ?
+  `,[point, user_id])
+
+  return result
+}
+
 module.exports = {
   signUp,
   signIn,
@@ -101,5 +148,10 @@ module.exports = {
   addUserToGymbyEmail,
   getUsersByGymAndRole,
   deleteUserByGym,
-  getGymsByUser
+  getGymsByUser,
+  getValidCoaches,
+  getCoaches,
+  updateValidStatus,
+  getVaidStatus,
+  updatePoint
 }

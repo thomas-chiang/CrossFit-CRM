@@ -8,7 +8,7 @@ router.route('/performance').put(authenticate('coach'),wrapAsync(Performance.upd
 router.route('/performance/courseuser').get(wrapAsync(Performance.getPerformancesByCourseUser));
 router.route('/performance/movementworkoutname/:performance_id').get(wrapAsync(Performance.getPerformanceWithMovementWorkoutName));
 router.route('/performance/usermovement/:movement_id').get(authenticate('member'),wrapAsync(Performance.getPerformanceByUserMovement))
-
+router.route('/performance/movement/').get(wrapAsync(Performance.getPerformanceByMovement))
 
 
 module.exports = router;

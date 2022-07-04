@@ -27,7 +27,7 @@ const addWorkoutMovement = async (newWorkoutMovement) => {
   return result 
 }
 
-const getWorkout = async (workout_id) => {
+const getWorkout = async (workout_id) => {   // movement issues
   const [workoutWithMovements] = await pool.query(`
     select 
       workouts.*,
@@ -41,9 +41,9 @@ const getWorkout = async (workout_id) => {
       workout_movement.sec, 
       movements.name as movement_name
     from workouts 
-    inner join workout_movement 
+    left join workout_movement 
     on workouts.id = workout_movement.workout_id
-    inner join movements 
+    left join movements 
     on workout_movement.movement_id = movements.id
     where workouts.id = ?
   `,[workout_id])
@@ -75,6 +75,8 @@ const getWorkout = async (workout_id) => {
         movements: [movementObj]
       }
     } 
+
+    if(!obj[item.id].movements[0].id) delete obj[item.id].movements
   }
   return obj
 }
@@ -165,7 +167,7 @@ const getWorkouts = async () => {
   return result
 }
 
-const getWorkoutsWithMovements = async () => {
+const getWorkoutsWithMovements = async () => { // movement issues
   const [workouts] = await pool.query(`
   select 
     workouts.*,
@@ -177,23 +179,23 @@ const getWorkoutsWithMovements = async () => {
     workout_movement.sec, 
     movements.name as movement_name
   from workouts 
-  inner join workout_movement 
+  left join workout_movement 
   on workouts.id = workout_movement.workout_id
-  inner join movements 
+  left join movements 
   on workout_movement.movement_id = movements.id
   `)
   
   let obj = {}
   for (const workout of workouts) {
 
-    let movementObj = {
+    let movementObj = workout.movement_name ? {
       name: workout.movement_name,
       kg: workout.kg,
       cal: workout.cal,
       rep: workout.rep,
       meter: workout.meter,
       sec: workout.sec
-    }
+    } : undefined
 
     if(obj[workout.id]){
       obj[workout.id].movements.push(movementObj)
@@ -205,10 +207,13 @@ const getWorkoutsWithMovements = async () => {
         note: workout.note,
         demo_link: workout.demo_link,
         creator_id: workout.creator_id,
-        movements: [movementObj]
+        movements: movementObj ? [movementObj] : undefined
       }
-    } 
+    }
+    
+    
   }
+
   return obj
 }
 
@@ -239,7 +244,7 @@ const getOwnedWorkouts = async (user) => {
 
 
 
-const getOwnedWorkoutsWithMovements = async (user) => {
+const getOwnedWorkoutsWithMovements = async (user) => {  // VS getWorkoutsWithMovements // movement issues
   const [workouts] = await pool.query(`
   select 
     workouts.*,
@@ -252,9 +257,9 @@ const getOwnedWorkoutsWithMovements = async (user) => {
     workout_movement.sec, 
     movements.name as movement_name
   from workouts 
-  inner join workout_movement 
+  left join workout_movement 
   on workouts.id = workout_movement.workout_id
-  inner join movements 
+  left join movements 
   on workout_movement.movement_id = movements.id
   where workouts.creator_id = ?
   `, [user.id])
@@ -263,16 +268,17 @@ const getOwnedWorkoutsWithMovements = async (user) => {
   for (const workout of workouts) {
 
     let movementObj = {
-      id: workout.workout_movement_id,
-      movement_id: workout.movement_id,
-      workout_id: workout.id,
-      name: workout.movement_name,
-      kg: workout.kg,
-      cal: workout.cal,
-      rep: workout.rep,
-      meter: workout.meter,
-      sec: workout.sec
-    }
+        id: workout.workout_movement_id,
+        movement_id: workout.movement_id,
+        workout_id: workout.id,
+        name: workout.movement_name,
+        kg: workout.kg,
+        cal: workout.cal,
+        rep: workout.rep,
+        meter: workout.meter,
+        sec: workout.sec
+      } 
+
 
     if(obj[workout.id]){
       obj[workout.id].movements.push(movementObj)
@@ -286,7 +292,9 @@ const getOwnedWorkoutsWithMovements = async (user) => {
         creator_id: workout.creator_id,
         movements: [movementObj]
       }
-    } 
+    }
+
+    if(!obj[workout.id].movements[0].id) delete obj[workout.id].movements
   }
   return obj
 }
