@@ -35,31 +35,31 @@ const getCourseEnrolledmembers = async (req, res) => {
   res.json(result)
 }
 
-const deletePerformance = async (req, res) => {
-  let performance = req.body
-  let result = await Course.deletePerformance(performance)
-  res.json(result)
-}
+// const deletePerformance = async (req, res) => {
+//   let performance = req.body
+//   let result = await Course.deletePerformance(performance)
+//   res.json(result)
+// }
 
-const updatePerformance = async (req, res) => {
-  let performance = req.body
-  delete performance.name
-  let result = await Course.updatePerformance(performance)
-  res.json(result)
-}
+// const updatePerformance = async (req, res) => {
+//   let performance = req.body
+//   delete performance.name
+//   let result = await Course.updatePerformance(performance)
+//   res.json(result)
+// }
 
-const getPerformaces = async (req, res) => {
-  let user_id = req.query.user_id
-  let course_id = req.query.course_id
-  let performances = await Course.getPerformaces(course_id, user_id)
-  res.json(performances)
-}
+// const getPerformaces = async (req, res) => {
+//   let user_id = req.query.user_id
+//   let course_id = req.query.course_id
+//   let performances = await Course.getPerformaces(course_id, user_id)
+//   res.json(performances)
+// }
 
-const createPerformance = async (req, res) => {
-  let performance = req.body
-  let result = await Course.createPerformance(performance)
-  res.json(result)
-}
+// const createPerformance = async (req, res) => {
+//   let performance = req.body
+//   let result = await Course.createPerformance(performance)
+//   res.json(result)
+// }
 
 const quit = async (req, res) => {
   let id = req.params.id
@@ -186,10 +186,10 @@ module.exports = {
   deleteCourse,
   enroll,
   quit,
-  createPerformance,
-  getPerformaces,
-  updatePerformance,
-  deletePerformance,
+  // createPerformance,
+  // getPerformaces,
+  // updatePerformance,
+  // deletePerformance,
   getCourseEnrolledmembers,
   enrollMemberByEmail,
   quitMemberById,

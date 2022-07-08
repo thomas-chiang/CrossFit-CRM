@@ -12,7 +12,7 @@ const getWorkoutMovements = async (workout_id) => {
   return result;
 }
 
-const updateOnlyNameAndNote = async (updatedWorkout) => {
+const updateOnlyWorkout = async (updatedWorkout) => {
   const [result] = await pool.query(
     `
       UPDATE workouts 
@@ -38,7 +38,7 @@ const getWorkout = async (workout_id) => {   // movement issues
       workout_movement.cal, 
       workout_movement.rep, 
       workout_movement.meter,
-      workout_movement.sec, 
+       
       movements.name as movement_name
     from workouts 
     left join workout_movement 
@@ -59,7 +59,7 @@ const getWorkout = async (workout_id) => {   // movement issues
       cal: item.cal,
       rep: item.rep,
       meter: item.meter,
-      sec: item.sec
+      //sec: item.sec
     }
 
     if(obj[item.id]){
@@ -68,7 +68,10 @@ const getWorkout = async (workout_id) => {   // movement issues
       obj[item.id] = {
         id: item.id,
         name: item.name,
+        round: item.round,
+        extra_count: item.extra_count,
         minute: item.minute,
+        extra_sec: item.extra_sec,
         note: item.note,
         demo_link: item.demo_link,
         creator_id: item.creator_id,
@@ -117,6 +120,7 @@ const createWorkoutWithMovement = async (workout) => {
       await conn.query('START TRANSACTION');
 
       let movementArr = workout.movementArr
+      
       delete workout.movementArr
 
       const [result] = await conn.query('INSERT INTO workouts SET ?', workout);
@@ -131,11 +135,11 @@ const createWorkoutWithMovement = async (workout) => {
           item.cal,
           item.rep,
           item.meter,
-          item.sec
+          //item.sec
         ])
       }
       
-      await conn.query('INSERT INTO workout_movement (workout_id, movement_id, kg, cal, rep, meter, sec) VALUES ?', [movements]);
+      await conn.query('INSERT INTO workout_movement (workout_id, movement_id, kg, cal, rep, meter) VALUES ?', [movements]);
       await conn.query('COMMIT');
       return result.insertId;
   } catch (error) {
@@ -147,10 +151,10 @@ const createWorkoutWithMovement = async (workout) => {
   }
 };
 
-const createWorkout = async (obj) => {
-  const [result] = await pool.query('INSERT INTO workouts SET ?', [obj])
-  return result;
-};
+// const createWorkout = async (obj) => {
+//   const [result] = await pool.query('INSERT INTO workouts SET ?', [obj])
+//   return result;
+// };
 
 const updateWorkout = async (obj) => {
   const [result] = await pool.query(
@@ -176,7 +180,7 @@ const getWorkoutsWithMovements = async () => { // movement issues
     workout_movement.cal, 
     workout_movement.rep, 
     workout_movement.meter,
-    workout_movement.sec, 
+     
     movements.name as movement_name
   from workouts 
   left join workout_movement 
@@ -194,7 +198,7 @@ const getWorkoutsWithMovements = async () => { // movement issues
       cal: workout.cal,
       rep: workout.rep,
       meter: workout.meter,
-      sec: workout.sec
+      // sec: workout.sec
     } : undefined
 
     if(obj[workout.id]){
@@ -203,15 +207,16 @@ const getWorkoutsWithMovements = async () => { // movement issues
       obj[workout.id] = {
         id: workout.id,
         name: workout.name,
+        round: workout.round,
+        extra_count: workout.extra_count,
         minute: workout.minute,
+        extra_sec: workout.extra_sec,
         note: workout.note,
         demo_link: workout.demo_link,
         creator_id: workout.creator_id,
         movements: movementObj ? [movementObj] : undefined
       }
-    }
-    
-    
+    }  
   }
 
   return obj
@@ -244,60 +249,60 @@ const getOwnedWorkouts = async (user) => {
 
 
 
-const getOwnedWorkoutsWithMovements = async (user) => {  // VS getWorkoutsWithMovements // movement issues
-  const [workouts] = await pool.query(`
-  select 
-    workouts.*,
-    workout_movement.id as workout_movement_id, 
-    workout_movement.movement_id, 
-    workout_movement.kg, 
-    workout_movement.cal, 
-    workout_movement.rep, 
-    workout_movement.meter,
-    workout_movement.sec, 
-    movements.name as movement_name
-  from workouts 
-  left join workout_movement 
-  on workouts.id = workout_movement.workout_id
-  left join movements 
-  on workout_movement.movement_id = movements.id
-  where workouts.creator_id = ?
-  `, [user.id])
+// const getOwnedWorkoutsWithMovements = async (user) => {  // VS getWorkoutsWithMovements // movement issues
+//   const [workouts] = await pool.query(`
+//   select 
+//     workouts.*,
+//     workout_movement.id as workout_movement_id, 
+//     workout_movement.movement_id, 
+//     workout_movement.kg, 
+//     workout_movement.cal, 
+//     workout_movement.rep, 
+//     workout_movement.meter,
+//     workout_movement.sec, 
+//     movements.name as movement_name
+//   from workouts 
+//   left join workout_movement 
+//   on workouts.id = workout_movement.workout_id
+//   left join movements 
+//   on workout_movement.movement_id = movements.id
+//   where workouts.creator_id = ?
+//   `, [user.id])
   
-  let obj = {}
-  for (const workout of workouts) {
+//   let obj = {}
+//   for (const workout of workouts) {
 
-    let movementObj = {
-        id: workout.workout_movement_id,
-        movement_id: workout.movement_id,
-        workout_id: workout.id,
-        name: workout.movement_name,
-        kg: workout.kg,
-        cal: workout.cal,
-        rep: workout.rep,
-        meter: workout.meter,
-        sec: workout.sec
-      } 
+//     let movementObj = {
+//         id: workout.workout_movement_id,
+//         movement_id: workout.movement_id,
+//         workout_id: workout.id,
+//         name: workout.movement_name,
+//         kg: workout.kg,
+//         cal: workout.cal,
+//         rep: workout.rep,
+//         meter: workout.meter,
+//         sec: workout.sec
+//       } 
 
 
-    if(obj[workout.id]){
-      obj[workout.id].movements.push(movementObj)
-    } else {
-      obj[workout.id] = {
-        id: workout.id,
-        name: workout.name,
-        minute: workout.minute,
-        note: workout.note,
-        demo_link: workout.demo_link,
-        creator_id: workout.creator_id,
-        movements: [movementObj]
-      }
-    }
+//     if(obj[workout.id]){
+//       obj[workout.id].movements.push(movementObj)
+//     } else {
+//       obj[workout.id] = {
+//         id: workout.id,
+//         name: workout.name,
+//         minute: workout.minute,
+//         note: workout.note,
+//         demo_link: workout.demo_link,
+//         creator_id: workout.creator_id,
+//         movements: [movementObj]
+//       }
+//     }
 
-    if(!obj[workout.id].movements[0].id) delete obj[workout.id].movements
-  }
-  return obj
-}
+//     if(!obj[workout.id].movements[0].id) delete obj[workout.id].movements
+//   }
+//   return obj
+// }
 
 
 
@@ -331,20 +336,20 @@ const deleteWorkoutWithMovements = async (workout) => {
 
 
 module.exports = {
-  createWorkout,
+  // createWorkout,
   updateWorkout,
   getWorkouts,
   deleteWorkout,
   getOwnedWorkouts,
   createWorkoutWithMovement,
   getWorkoutsWithMovements,
-  getOwnedWorkoutsWithMovements,
+  // getOwnedWorkoutsWithMovements,
   deleteWorkoutWithMovements,
   getWorkoutMovement,
   updateWorkoutMovement,
   deleteWorkoutMovement,
   getWorkout,
   addWorkoutMovement,
-  updateOnlyNameAndNote,
+  updateOnlyWorkout,
   getWorkoutMovements
 }

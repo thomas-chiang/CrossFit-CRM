@@ -6,11 +6,22 @@ const getWorkoutMovements = async (req, res) => {
   res.json(result)
 }
 
-const updateOnlyNameAndNote = async(req, res) => {
+const updateOnlyWorkout = async(req, res) => {
   let updatedWorkout = req.body
+  
   if(!updatedWorkout.name) return res.status(400).json({error: 'Workout name cannot be emtpy'})
+  if(updatedWorkout.round < 0 || updatedWorkout.extra_count < 0 || updatedWorkout.minute < 0 || updatedWorkout.extra_sec < 0) return res.status(400).json({error:'Round, extra rep, minute, or extra sec must >= 0 or leave empty'})
+  if(updatedWorkout.extra_sec > 59) return res.status(400).json({error:'Extra sec must < 60'})
+
+  let tempWorkoutSum = 0
+  for (let property in updatedWorkout){
+    if(updatedWorkout[property] > 0 && (property == 'round' || property == 'extra_count' || property == 'minute' || property == 'extra_sec')) tempWorkoutSum += updatedWorkout[property]
+    if(!updatedWorkout[property]) updatedWorkout[property] = null
+  }
+  if(tempWorkoutSum == 0) return res.status(400).json({error:'Aleast one of the measures (round, extra rep, minute, or extra sec) should > 0'})
+
   delete updatedWorkout.movements
-  let result = await Workout.updateOnlyNameAndNote(updatedWorkout)
+  let result = await Workout.updateOnlyWorkout(updatedWorkout)
   res.json(result)
 }
 
@@ -36,6 +47,10 @@ const deleteWorkoutMovement = async (req, res) => {
 
 const updateWorkoutMovement = async (req, res) => {
   let workoutMovement = req.body
+  for (let property in workoutMovement) {
+    if(workoutMovement[property] < 0 || workoutMovement[property] === '0') return res.status(400).json({error: 'Kg, rep, meter, cal, or sec must > 0'})
+    if(!workoutMovement[property]) workoutMovement[property] = null
+  }
   delete workoutMovement.name
   let result = await Workout.updateWorkoutMovement(workoutMovement)
   res.json(result)
@@ -50,19 +65,38 @@ const getWorkoutMovement = async (req, res) => {
 const createWorkoutWithMovement = async (req, res) => {
   const workout = req.body
   if(!workout.name) return res.status(400).json({error:'Workout name cannot be empty'})
+  if(workout.round < 0 || workout.extra_count < 0 || workout.minute < 0 || workout.extra_sec < 0) return res.status(400).json({error:'Round, extra rep, minute, or extra sec must >= 0 or leave empty'})
+  if(workout.extra_sec > 59) return res.status(400).json({error:'Extra sec must < 60'})
+  
+  let tempWorkoutSum = 0
+  for (let property in workout){
+    if(workout[property] > 0 && (property == 'round' || property == 'extra_count' || property == 'minute' || property == 'extra_sec')) tempWorkoutSum += workout[property]
+    if(!workout[property]) workout[property] = null
+  }
+  if(tempWorkoutSum == 0) return res.status(400).json({error:'Aleast one of the measures (round, extra rep, minute, or extra sec) should > 0'})
+   
+
+  for (let movement of workout.movementArr) {
+    for (let property in movement) {
+      if(movement[property] < 0 || movement[property] === '0') return res.status(400).json({error: 'Kg, rep, meter, cal, or sec must > 0'})
+      if(!movement[property]) movement[property] = null
+    }
+  }
+  
   let user = req.user
   workout.creator_id = user.id
   let result = await Workout.createWorkoutWithMovement(workout)
-  res.json(result);
-};
+  res.json(result)
 
-const createWorkout = async (req, res) => {
-  const workout = req.body
-  let user = req.user
-  workout.creator_id = user.id
-  let result = await Workout.createWorkout(workout)
-  res.json(result);
-};
+}
+
+// const createWorkout = async (req, res) => {
+//   const workout = req.body
+//   let user = req.user
+//   workout.creator_id = user.id
+//   let result = await Workout.createWorkout(workout)
+//   res.json(result);
+// };
 
 const updateWorkout = async (req, res) => {
   const updatedWorkout = req.body
@@ -116,7 +150,7 @@ const deleteWorkoutWorkoutWithMovements = async (req, res) => {
 
 
 module.exports = {
-  createWorkout,
+  // createWorkout,
   getWorkouts,
   updateWorkout,
   deleteWorkout,
@@ -130,6 +164,6 @@ module.exports = {
   deleteWorkoutMovement,
   getWorkout,
   addWorkoutMovement,
-  updateOnlyNameAndNote,
+  updateOnlyWorkout,
   getWorkoutMovements
 }

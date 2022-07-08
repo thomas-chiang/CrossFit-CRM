@@ -64,8 +64,11 @@ const enrollMemberByEmail = async (course_id, email) => {
   try{
     await conn.query('start transaction')
 
-    let [user_result] = await conn.query(`select * from users where email = ?`,[email])
+    let [user_result] = await conn.query(`select * from users where email = ? and role = 1`,[email])
     if(user_result.length === 0) throw {message: 'no such email', status: 400}
+
+    let validStatus = user_result[0].valid
+    if(validStatus === 0) throw {message: 'Invalid member status', status: 400}
     
     let user_id = user_result[0].id
     let points_available = user_result[0].point - user_result[0].point_to_be_deducted
@@ -108,45 +111,46 @@ const getCourseEnrolledmembers = async (course_id) => {
   return result
 }
 
-const deletePerformance = async (performance) => {
-  const [result] = await pool.query(`
-    delete from course_user_workout 
-    where
-      course_id = ?
-      and user_id = ?
-      and workout_id = ?
-  `, [performance.course_id, performance.user_id, performance.workout_id])
-  return result
-}
+// const deletePerformance = async (performance) => {
+//   const [result] = await pool.query(`
+//     delete from course_user_workout 
+//     where
+//       course_id = ?
+//       and user_id = ?
+//       and workout_id = ?
+//   `, [performance.course_id, performance.user_id, performance.workout_id])
+//   return result
+// }
 
-const updatePerformance = async (performance) => {
-  const [result] = await pool.query(`
-    UPDATE course_user_workout SET ? 
-    where 
-      course_id = ?
-      and user_id = ?
-      and workout_id = ?
-  `, [performance, performance.course_id, performance.user_id, performance.workout_id])
-  return result
-}
+// const updatePerformance = async (performance) => {
+//   const [result] = await pool.query(`
+//     UPDATE course_user_workout SET ? 
+//     where 
+//       course_id = ?
+//       and user_id = ?
+//       and workout_id = ?
+//   `, [performance, performance.course_id, performance.user_id, performance.workout_id])
+//   return result
+// }
 
-const getPerformaces = async (course_id, user_id) => {
-  const [performances] = await pool.query(`
-    select 
-      course_user_workout.*,
-      workouts.name
-    from course_user_workout
-    left join workouts on course_user_workout.workout_id = workouts.id
-    where course_id = ? and user_id = ? 
-  `,[course_id, user_id])
+// const getPerformaces = async (course_id, user_id) => {
+//   const [performances] = await pool.query(`
+//     select 
+//       course_user_workout.*,
+//       workouts.name
+//     from course_user_workout
+//     left join workouts on course_user_workout.workout_id = workouts.id
+//     where course_id = ? and user_id = ? 
+//   `,[course_id, user_id])
 
-  return performances
-}
+//   return performances
+// }
 
-const createPerformance = async (performance) => {
-  const [result] = await pool.query('INSERT INTO course_user_workout SET ? ', [performance])
-  return result
-}
+// const createPerformance = async (performance) => {
+//   console.log(performance)
+//   const [result] = await pool.query('INSERT INTO course_user_workout SET ? ', [performance])
+//   return result
+// }
 
 const quit = async (id, user) => {
   const conn = await pool.getConnection()
@@ -427,6 +431,11 @@ const getCourses = async () => {
       users.name as user_name, 
       workouts.id as workout_id, 
       workouts.name as workout_name,
+      workouts.round as workout_round,
+      workouts.extra_count as workout_extra_count,
+      workouts.minute as workout_minute,
+      workouts.extra_sec as workout_extra_sec,
+      workouts.note as workout_note,
       course_user.enrollment as enrollment
     from courses 
     left join course_user on courses.id = course_user.course_id
@@ -456,7 +465,12 @@ const getCourses = async () => {
           ...obj[item.id].workouts,
           [item.workout_id]:{
             id: item.workout_id,
-            name: item.workout_name
+            name: item.workout_name,
+            round: item.workout_round,
+            extra_count: item.workout_extra_count,
+            minute: item.workout_minute,
+            extra_sec: item.workout_extra_sec,
+            note: item.workout_note
           }
         }
       }
@@ -498,7 +512,12 @@ const getCourses = async () => {
           workouts: {
             [item.workout_id]:{
               id: item.workout_id,
-              name: item.workout_name
+              name: item.workout_name,
+              round: item.workout_round,
+              extra_count: item.workout_extra_count,
+              minute: item.workout_minute,
+              extra_sec: item.workout_extra_sec,
+              note: item.workout_note
             }
           }
         }
@@ -536,10 +555,10 @@ module.exports = {
   deleteCourse,
   enroll,
   quit,
-  createPerformance,
-  getPerformaces,
-  updatePerformance,
-  deletePerformance,
+  // createPerformance,
+  // getPerformaces,
+  // updatePerformance,
+  // deletePerformance,
   getCourseEnrolledmembers,
   enrollMemberByEmail,
   quitMemberById,
