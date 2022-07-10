@@ -1,6 +1,6 @@
 const { pool } = require('./mysql_conn');
 
-const checkoutMemberById = async (course_id, user_id, enrollment) => {
+const checkoutMemberById = async (course_id, user_id, enrollment, creator_id) => {
   const conn = await pool.getConnection()
   try{
     await conn.query('start transaction')
@@ -9,19 +9,26 @@ const checkoutMemberById = async (course_id, user_id, enrollment) => {
 
     let [course_result] = await conn.query(`select * from courses where id = ?`,[course_id])
     let course_point = course_result[0].point
+
+    
     if (enrollment == 1){
-      await conn.query(`
-        update users set 
-        point_to_be_deducted = point_to_be_deducted - ? ,
-        point = point - ?
-        where id = ?
-      `,[course_point, course_point, user_id])
+      let pointObj = {
+        course_id: course_id,
+        point: - course_point,
+        point_to_be_deducted: - course_point,
+        user_id: user_id,
+        creator_id: creator_id,
+      }
+      await conn.query('insert into points set ?', [pointObj])
+
     } else {
-      await conn.query(`
-        update users set 
-        point = point - ?
-        where id = ?
-      `,[course_point, user_id])
+      let pointObj = {
+        course_id: course_id,
+        point: - course_point,
+        user_id: user_id,
+        creator_id: creator_id,
+      }
+      await conn.query('insert into points set ?', [pointObj])
     }
     
     await conn.query('commit')
@@ -35,7 +42,8 @@ const checkoutMemberById = async (course_id, user_id, enrollment) => {
   }
 }
 
-const quitMemberById = async (course_id, user_id, enrollment) => {
+
+const quitMemberById = async (course_id, user_id, enrollment, creator_id) => {
   const conn = await pool.getConnection()
   try{
     await conn.query('start transaction')
@@ -45,7 +53,50 @@ const quitMemberById = async (course_id, user_id, enrollment) => {
     if (enrollment == 1){
       let [course_result] = await conn.query(`select * from courses where id = ?`,[course_id])
       let course_point = course_result[0].point
-      await conn.query(`update users set point_to_be_deducted = point_to_be_deducted - ? where id = ?`,[course_point, user_id])
+
+      // deduct point_to_be_deducted
+      let pointObj = {
+        course_id: course_id,
+        point_to_be_deducted: - course_point,
+        user_id: user_id,
+        creator_id: creator_id,
+      }
+      await conn.query('insert into points set ?', [pointObj])
+
+
+      // check if there is next user
+      let [next_users_result] = await conn.query(` 
+        select 
+          course_user.user_id 
+        from course_user 
+        left join (
+          select 
+            user_id, 
+            IFNULL(sum(point),0) as point, 
+            IFNULL(sum(point_to_be_deducted),0) as point_to_be_deducted
+          from points
+          group by user_id
+        ) sum_points on sum_points.user_id = course_user.user_id
+        where course_user.enrollment > 1 
+        and course_user.course_id = ?
+        and sum_points.point - sum_points.point_to_be_deducted > ? 
+        order by course_user.enrollment asc
+      `, [course_id, course_point]) 
+
+      // next user existed
+      if(next_users_result.length > 0) {  
+        let next_user_id = next_users_result[0].user_id
+
+        let pointObj = {
+          course_id: id,
+          point_to_be_deducted: course_point,
+          user_id: next_user_id,
+          creator_id: user.id,
+        }
+        
+        await conn.query('update course_user set enrollment = 1 where course_id = ? and user_id = ?', [id, next_user_id])
+        await conn.query('insert into points set ?', [pointObj])
+      }
     }
     
     await conn.query('commit')
@@ -59,11 +110,12 @@ const quitMemberById = async (course_id, user_id, enrollment) => {
   }
 }
 
-const enrollMemberByEmail = async (course_id, email) => {
+const enrollMemberByEmail = async (course_id, email, creator_id) => {
   const conn = await pool.getConnection()
   try{
     await conn.query('start transaction')
 
+    // check user status
     let [user_result] = await conn.query(`select * from users where email = ? and role = 1`,[email])
     if(user_result.length === 0) throw {message: 'no such email', status: 400}
 
@@ -71,14 +123,36 @@ const enrollMemberByEmail = async (course_id, email) => {
     if(validStatus === 0) throw {message: 'Invalid member status', status: 400}
     
     let user_id = user_result[0].id
-    let points_available = user_result[0].point - user_result[0].point_to_be_deducted
+
+    let [course_user_result] = await conn.query(`select * from course_user where course_id = ? and user_id = ?`, [course_id, user_id])
+    if (course_user_result.length > 0) throw {message: 'Member is already on enrollment list. Please quit the member first', status: 400}
+
+    // check point status
+    let [points_result] = await conn.query(`
+      select
+        IFNULL(sum(point),0) as point, 
+        IFNULL(sum(point_to_be_deducted),0) as point_to_be_deducted
+      from points
+      where user_id = ?
+    `,[user_id])
+
+    let points_available = points_result[0].point - points_result[0].point_to_be_deducted
 
     let [course_result] = await conn.query(`select * from courses where id = ?`,[course_id])
     let course_point = course_result[0].point
 
+    // points enough
     if(course_point > points_available) throw {message: 'do not have enough points', status: 400}
-    await conn.query(`update users set point_to_be_deducted = point_to_be_deducted + ? where id = ?`,[course_point, user_id])
+    let pointObj = {
+      course_id: course_id,
+      point_to_be_deducted: course_point,
+      user_id: user_id,
+      creator_id: creator_id,
+    }
+    await conn.query('insert into points set ?', [pointObj])
 
+
+    // update enrollment to 1
     let [result] = await conn.query(`
       insert into course_user (course_id, user_id, enrollment) values (?, ?, ?)
     `,[course_id, user_id, 1])
@@ -185,6 +259,7 @@ const quit = async (id, user) => {
     await conn.query('insert into points set ?', [pointObj])
 
     
+    // next user
     let next_user_id = 0
     if (course_user_enrollment == 1) { // if originally enrolled, check next user
       // check next users with "enough points"
@@ -195,8 +270,8 @@ const quit = async (id, user) => {
         left join (
           select 
             user_id, 
-            IFNULL(sum(point),1) as point, 
-            sum(point_to_be_deducted) as point_to_be_deducted
+            IFNULL(sum(point),0) as point, 
+            IFNULL(sum(point_to_be_deducted),0) as point_to_be_deducted
           from points
           group by user_id
         ) sum_points on sum_points.user_id = course_user.user_id
@@ -206,12 +281,16 @@ const quit = async (id, user) => {
         order by course_user.enrollment asc
       `, [id, course_point]) 
 
-
-
-      pointObj.point_to_be_deducted = -pointObj.point_to_be_deducted
       if(next_users_result.length > 0) {  // next user existed
         next_user_id = next_users_result[0].user_id
-        pointObj.user_id = next_user_id
+
+        let pointObj = {
+          course_id: id,
+          point_to_be_deducted: course_point,
+          user_id: next_user_id,
+          creator_id: user.id,
+        }
+
         await conn.query('update course_user set enrollment = 1 where course_id = ? and user_id = ?', [id, next_user_id])
         //await conn.query('update users set point_to_be_deducted = point_to_be_deducted + ? where id = ?', [course_point, next_user_id])  // add point to be deducted
         await conn.query('insert into points set ?', [pointObj])
@@ -260,8 +339,8 @@ const enroll = async (id, user) => {
     let size_enrolled = size_enrolled_result.length
     let [point_result] = await conn.query(`
       select
-        IFNULL(sum(point),1) as point, 
-        IFNULL(sum(point_to_be_deducted),1) as point_to_be_deducted
+        IFNULL(sum(point),0) as point, 
+        IFNULL(sum(point_to_be_deducted),0) as point_to_be_deducted
       from points
       where user_id = ?
     `,[user.id])

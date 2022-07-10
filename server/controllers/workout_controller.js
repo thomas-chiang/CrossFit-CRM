@@ -47,7 +47,6 @@ const deleteWorkoutMovement = async (req, res) => {
 
 const updateWorkoutMovement = async (req, res) => {
   let workoutMovement = req.body
-  console.log(workoutMovement)
 
   let tempMovementSum = 0
   for (let property in workoutMovement) {

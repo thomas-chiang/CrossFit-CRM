@@ -7,8 +7,8 @@ const bcrypt = require('bcrypt');
 
 const signUp = async (req, res) => {
   //check input format
-  let {name, email, password, gender} = req.body;
-  if(!name || !email || !password || !gender) return res.status(400).json({error:'Request Error: name, email, gender, and password are required.'})
+  let {name, email, password, gender, role} = req.body;
+  if(!name || !email || !password || !gender || !role) return res.status(400).json({error:'Request Error: name, email, gender, role, and password are required.'})
   if (!validator.isEmail(email)) return res.status(400).json({error:'Request Error: Invalid email format'})
   
   //handle input

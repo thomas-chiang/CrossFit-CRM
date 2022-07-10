@@ -2,30 +2,33 @@ const Course = require('../models/course_model')
 const validator = require('validator');
 
 const checkoutMemberById = async (req, res) => {
+  let creator_id = req.user.id
   let user_id = req.query.user_id
   let course_id = req.query.course_id
   let enrollment = req.query.enrollment
   if(!course_id || !user_id) return res.status(500).json({error:'Server Error: Please refresh page or reach out to gym'})
-  let result = await Course.checkoutMemberById(course_id, user_id, enrollment)
+  let result = await Course.checkoutMemberById(course_id, user_id, enrollment, creator_id)
   res.json(result)
 }
 
 const quitMemberById = async (req, res) => {
+  let creator_id = req.user.id
   let user_id = req.query.user_id
   let course_id = req.query.course_id
   let enrollment = req.query.enrollment
   if(!course_id || !user_id) return res.status(500).json({error:'Server Error: Please refresh page or reach out to gym'})
-  let result = await Course.quitMemberById(course_id, user_id, enrollment)
+  let result = await Course.quitMemberById(course_id, user_id, enrollment, creator_id)
   res.json(result)
 }
 
 const enrollMemberByEmail = async (req, res) => {
+  let creator_id = req.user.id
   let email = req.query.email
   let course_id = req.query.course_id
   if(!email) return res.status(400).json({error:'Request Error: email is required.'})
   if(!course_id) return res.status(500).json({error:'Server Error: Please refresh page or reach out to IT'})
   if(!validator.isEmail(email)) return res.status(400).json({error:'Request Error: Invalid email format'})
-  let result = await Course.enrollMemberByEmail(course_id, email)
+  let result = await Course.enrollMemberByEmail(course_id, email, creator_id)
   res.json(result)
 }
 
