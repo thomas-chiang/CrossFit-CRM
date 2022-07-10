@@ -232,8 +232,10 @@ const quit = async (id, user) => {
     await conn.query('start transaction')
 
     //check if already quit
-    let [course_user_result] = await conn.query('select * from course_user where course_id = ? and user_id = ?', [id, user.id])
+    let [course_user_result] = await conn.query('select * from course_user where course_id = ? and user_id = ? and enrollment > 0', [id, user.id])
     if(course_user_result.length == 0) throw {message: 'cannot quit without enrollment', status: 400}
+
+    //check if already canceled
 
     // start lock
     await conn.query('update semaphore set record = record + 1 where course_id = ?', [id])
@@ -248,20 +250,23 @@ const quit = async (id, user) => {
  
      
 
-    // change enrollment status & add points back
-    let pointObj = {
-      course_id: id,
-      point_to_be_deducted: - course_point,
-      user_id: user.id,
-      creator_id: user.id,
-    }
+    // change enrollment status 
+    
     await conn.query('update course_user set enrollment = 0 where course_id = ? and user_id = ?', [id, user.id])
-    await conn.query('insert into points set ?', [pointObj])
+    
 
     
     // next user
     let next_user_id = 0
-    if (course_user_enrollment == 1) { // if originally enrolled, check next user
+    if (course_user_enrollment == 1) { 
+      // add back points_to_be_deducted 
+      let pointObj = {
+        course_id: id,
+        point_to_be_deducted: - course_point,
+        user_id: user.id,
+        creator_id: user.id,
+      }
+      await conn.query('insert into points set ?', [pointObj])
       // check next users with "enough points"
       let [next_users_result] = await conn.query(` 
         select 
@@ -535,7 +540,6 @@ const getCourses = async () => {
   let [results] = await pool.query(`
     select 
       courses.*, 
-      gyms.name as gym_name,
       users.role, 
       users.id as user_id, 
       users.name as user_name, 
@@ -552,7 +556,6 @@ const getCourses = async () => {
     left join users on course_user.user_id = users.id 
     left join course_workout on courses.id = course_workout.course_id
     left join workouts on course_workout.workout_id = workouts.id
-    left join gyms on courses.gym_id = gyms.id  
   `)
   
   let obj = {}
@@ -588,14 +591,14 @@ const getCourses = async () => {
       obj[item.id] = {
         id: item.id,
         creator_id: item.creator_id,
-        gym_id: item.gym_id,
-        gym_name: item.gym_name,
-        gym: {
-          id: item.gym_id,
-          label: item.gym_name,
-          value: item.gym_id,
-          name: item.gym_name
-        },
+        // gym_id: item.gym_id,
+        // gym_name: item.gym_name,
+        // gym: {
+        //   id: item.gym_id,
+        //   label: item.gym_name,
+        //   value: item.gym_id,
+        //   name: item.gym_name
+        // },
         title: item.title,
         size: item.size,
         start: item.start,

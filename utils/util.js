@@ -28,7 +28,7 @@ const authenticate = (role) => {
             if (role === 'member') next()
             else if (role === 'coach' && user.role >= 2) next()
             else if (role === 'gym' && user.role >= 3 ) next()
-            else if (role === 'only member' && user.role === 1) next()
+            else if (role === 'only member' && user.role == 1) next()
             else throw new Error
                
         } catch(err) {
