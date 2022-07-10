@@ -175,30 +175,46 @@ const quit = async (id, user) => {
      
 
     // change enrollment status & add points back
+    let pointObj = {
+      course_id: id,
+      point_to_be_deducted: - course_point,
+      user_id: user.id,
+      creator_id: user.id,
+    }
     await conn.query('update course_user set enrollment = 0 where course_id = ? and user_id = ?', [id, user.id])
-    await conn.query('update users set point_to_be_deducted = point_to_be_deducted - ? where id = ?', [course_point, user.id])
-   
+    await conn.query('insert into points set ?', [pointObj])
 
     
     let next_user_id = 0
     if (course_user_enrollment == 1) { // if originally enrolled, check next user
-
       // check next users with "enough points"
       let [next_users_result] = await conn.query(` 
         select 
           course_user.user_id 
         from course_user 
-        left join users on course_user.user_id = users.id 
+        left join (
+          select 
+            user_id, 
+            IFNULL(sum(point),1) as point, 
+            sum(point_to_be_deducted) as point_to_be_deducted
+          from points
+          group by user_id
+        ) sum_points on sum_points.user_id = course_user.user_id
         where course_user.enrollment > 1 
         and course_user.course_id = ?
-        and users.point - users.point_to_be_deducted > ? 
+        and sum_points.point - sum_points.point_to_be_deducted > ? 
         order by course_user.enrollment asc
       `, [id, course_point]) 
 
+
+
+      pointObj.point_to_be_deducted = -pointObj.point_to_be_deducted
       if(next_users_result.length > 0) {  // next user existed
         next_user_id = next_users_result[0].user_id
+        pointObj.user_id = next_user_id
         await conn.query('update course_user set enrollment = 1 where course_id = ? and user_id = ?', [id, next_user_id])
-        await conn.query('update users set point_to_be_deducted = point_to_be_deducted + ? where id = ?', [course_point, next_user_id])  // add point to be deducted
+        //await conn.query('update users set point_to_be_deducted = point_to_be_deducted + ? where id = ?', [course_point, next_user_id])  // add point to be deducted
+        await conn.query('insert into points set ?', [pointObj])
       }
     } 
 
@@ -212,6 +228,9 @@ const quit = async (id, user) => {
     await conn.release()
   }
 }
+
+
+
 
 const enroll = async (id, user) => {
   const conn = await pool.getConnection()
@@ -239,9 +258,15 @@ const enroll = async (id, user) => {
         and users.role = 1
       `,[id])
     let size_enrolled = size_enrolled_result.length
-    let [user_result] = await conn.query(`select * from users where id = ?`,[user.id])
-    let user_point = user_result[0].point
-    let user_point_to_be_deducted = user_result[0].point_to_be_deducted 
+    let [point_result] = await conn.query(`
+      select
+        IFNULL(sum(point),1) as point, 
+        IFNULL(sum(point_to_be_deducted),1) as point_to_be_deducted
+      from points
+      where user_id = ?
+    `,[user.id])
+    let user_point = point_result[0].point
+    let user_point_to_be_deducted = point_result[0].point_to_be_deducted 
 
     //check if points are enough
     if(course_point > user_point - user_point_to_be_deducted) throw {message: 'do not have enough points', status: 400}
@@ -254,17 +279,23 @@ const enroll = async (id, user) => {
 
 
     let result = null
+    let pointObj = {
+      course_id: id,
+      point_to_be_deducted: course_point,
+      user_id: user.id,
+      creator_id: user.id,
+    }
     if(size_enrolled < size) { 
       // having avaliable spots
       if(enrollButQuit_user_id == 0) {
         // user did not quit the course in the past
         result = await conn.query('INSERT INTO course_user (course_id, user_id, enrollment) VALUES (?, ?, ?)', [id, user.id, 1]);
-        await conn.query('update users set point_to_be_deducted = point_to_be_deducted + ? where id = ?', [course_point, user.id]) // add point to be deducted
+        await conn.query('insert into points set ?', [pointObj]) // add point to be deducted
       }
       else {
         // user did enrolled but quit in the past
         result = await conn.query('update course_user set enrollment = 1 where course_id = ? and user_id = ?', [id, enrollButQuit_user_id]);
-        await conn.query('update users set point_to_be_deducted = point_to_be_deducted + ? where id = ?', [course_point, user.id]) // add point to be deducted
+        await conn.query('insert into points set ?', [pointObj]) // add point to be deducted
       }
     } else { 
       // no avaliable spot

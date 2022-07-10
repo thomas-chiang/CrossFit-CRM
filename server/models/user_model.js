@@ -21,14 +21,38 @@ const signIn = async (role, email) => {
 };
 
 const getUserProfile = async (role, email) => {
-  const [result] = await pool.query(`select * from users where role = ? and email = ? `, [ role, email ]);
+  const [result] = await pool.query(` 
+    select * 
+    from users
+    left join (
+      select 
+        user_id, 
+        sum(point) as point, 
+        sum(point_to_be_deducted) as point_to_be_deducted
+      from points
+      group by user_id
+    ) sum_points on sum_points.user_id = users.id
+    where role = ? and email = ? 
+  `, [ role, email ]);
   let user = result[0]
   return user
 };
 
 
 const getUsersByRole = async (role) => {
-  const [users] = await pool.query('select * from users where role = ? ', [ role ]);
+  const [users] = await pool.query(`
+    select * 
+    from users
+    left join (
+      select 
+        user_id, 
+        sum(point) as point, 
+        sum(point_to_be_deducted) as point_to_be_deducted
+      from points
+      group by user_id
+    ) sum_points on sum_points.user_id = users.id 
+    where role = ?
+  `, [ role ]);
   return users
 }
 
@@ -140,6 +164,15 @@ const updatePoint = async (user_id, point) => {
   return result
 }
 
+const insertPoint = async (user_id, point, creator_id, time) => {
+  let [result] = await pool.query(`
+    insert into points set ?
+  `,[{user_id, point, creator_id, time}])
+
+  return result
+}
+
+
 module.exports = {
   signUp,
   signIn,
@@ -153,5 +186,6 @@ module.exports = {
   getCoaches,
   updateValidStatus,
   getVaidStatus,
-  updatePoint
+  updatePoint,
+  insertPoint,
 }

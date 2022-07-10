@@ -86,27 +86,25 @@ const deletePerformance = async (performance) => {
   return result
 };
 
-const getLeaderboardByWorkout = async (workout_id) => {
+const getLeaderboardByWorkout = async (workout_id, movementsLength) => {
   const [result] = await pool.query(`
-    SELECT
-      workouts.name,
-      workouts.round,
-      workouts.extra_count,
-      workouts.minute,
-      workouts.extra_sec,
-      workouts.note,
+  SELECT
       performances.id,
       performances.course_id,
       performances.user_id,
-      (performances.round + performances.extra_count / workout_total_count.total_count) / workouts.round as round_ratio,
-      workouts.minute / (performances.minute + performances.extra_sec / 60) as minute_ratio,
-      performances.kg / workout_movement.kg as kg_ratio,
-      performances.rep / workout_movement.rep as rep_ratio,
-      performances.meter / workout_movement.meter as meter_ratio,
-      performances.cal / workout_movement.cal as cal_ratio
+      users.name,
+      IFNULL((performances.round + performances.extra_count / workout_total_count.total_count) / workouts.round, 1) as round_m, 
+      IFNULL(workouts.minute / (performances.minute + performances.extra_sec / 60), 1) as minute_m,
+      IFNULL(performances.kg / workout_movement.kg, 1) as kg_m,
+      IFNULL(performances.rep / workout_movement.rep, 1) as rep_m,
+      IFNULL(performances.meter / workout_movement.meter, 1) as meter_m,
+      IFNULL(performances.cal / workout_movement.cal, 1) as cal_m,
+      IFNULL(performances.kg / workout_movement.kg, 1) 
+      * IFNULL(performances.rep / workout_movement.rep, 1) 
+      * IFNULL(performances.meter / workout_movement.meter, 1) 
+      * IFNULL(performances.cal / workout_movement.cal, 1) as ratio
     FROM performances
-    left join workout_movement 
-      on (performances.workout_id = workout_movement.workout_id and performances.movement_id = workout_movement.movement_id)
+    left join workout_movement on performances.workout_movement_id = workout_movement.id
     left join workouts on performances.workout_id = workouts.id
     left join (
       select 
@@ -114,8 +112,10 @@ const getLeaderboardByWorkout = async (workout_id) => {
       from workout_movement
       group by workout_id
     ) workout_total_count on performances.workout_id = workout_total_count.workout_id
+    left join users on performances.user_id = users.id
     where performances.workout_id = ?
-  `,[workout_id]);
+    limit ?
+  `,[workout_id, movementsLength*10]);
   return result
 }
 

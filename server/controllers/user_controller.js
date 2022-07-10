@@ -54,10 +54,10 @@ const getUserProfile = async (req, res) => {
 
   let result = await User.getUserProfile(user.role, user.email)
 
-  let gyms = await User.getGymsByUser(user)
+  //let gyms = await User.getGymsByUser(user)
 
   user = result
-  user.gyms = gyms
+  //user.gyms = gyms
   delete user.password
 
   res.status(200).json(user);
@@ -138,6 +138,24 @@ const updatePoint = async (req, res) => {
   res.status(200).json(result)
 }
 
+const insertPoint = async (req, res) => {
+  let creator_id = req.user.id
+  let user_id = req.query.user_id
+  let point = req.query.point
+  let time = new Date()
+  let result = await User.insertPoint(user_id, point, creator_id, time)
+
+  res.status(200).json(result)
+}
+
+// const getPoint = async (req, res) => {
+//   let user_id = req.params.user_id
+//   let result = await User.getPoint(user_id)
+  
+//   res.status(200).json(result)
+// }
+
+
 module.exports = {
   signUp,
   signIn,
@@ -149,5 +167,6 @@ module.exports = {
   getValidCoaches,
   getCoaches,
   updateValidStatus,
-  updatePoint
+  updatePoint,
+  insertPoint,
 };

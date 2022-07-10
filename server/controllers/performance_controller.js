@@ -1,5 +1,5 @@
 const Performance = require('../models/performance_model')
-
+const Workout = require('../models/workout_model')
 
 const getPerformanceByMovement = async (req, res) => {
   let user_id = req.query.user_id
@@ -23,14 +23,24 @@ const getPerformanceWithMovementWorkoutName = async (req, res) => {
 
 const updatePerformance = async (req, res) => {
   let performance = req.body
+  console.log(performance)
   delete performance.name
+  let tempWorkoutSum = 0
   let tempPerformanceSum = 0
   for (let property in performance) {
-    if(performance[property] > 0 && (property == 'kg' || property == 'rep' || property == 'meter' || property == 'cal' || property == 'sec')) tempPerformanceSum += performance[property]
-    if(performance[property] < 0 || performance[property] === '0') return res.status(400).json({error: 'Kg, rep, meter, cal, or sec must > 0'})
-    if(!performance[property])performance[property]=null
+    if(performance[property] > 0 && (property == 'round' || property == 'extra_count' || property == 'minute' || property == 'extra_sec')) 
+      tempWorkoutSum += performance[property]
+
+    if(performance[property] > 0 && (property == 'kg' || property == 'rep' || property == 'meter' || property == 'cal')) 
+      tempPerformanceSum += performance[property]
+
+    if(performance[property] < 0/*  || performance[property] === '0' */) 
+      return res.status(400).json({error: 'Round, extra rep, minute, extra sec, kg, rep, meter, or cal must >= 0 or leave empty'})
+      
+    // if(!performance[property])performance[property]=null  // not set null
   }
-  if(tempPerformanceSum == 0) return res.status(400).json({error: 'At least one of the measures (Kg, rep, meter, cal, or sec) should > 0'})
+  if(tempWorkoutSum == 0) return res.status(400).json({error: 'At least one of the measures (Round, extra rep, minute, or extra sec) should > 0'})
+  if(tempPerformanceSum == 0) return res.status(400).json({error: 'At least one of the measures (Kg, rep, meter, or cal) should > 0'})
   let result = await Performance.updatePerformance(performance)
   res.json(result)
 }
@@ -49,16 +59,16 @@ const createPerformance = async (req, res) => {
     if(performance[property] > 0 && (property == 'round' || property == 'extra_count' || property == 'minute' || property == 'extra_sec')) 
       tempWorkoutSum += performance[property]
 
-    if(performance[property] > 0 && (property == 'kg' || property == 'rep' || property == 'meter' || property == 'cal' || property == 'sec')) 
+    if(performance[property] > 0 && (property == 'kg' || property == 'rep' || property == 'meter' || property == 'cal')) 
       tempPerformanceSum += performance[property]
 
-    if(performance[property] < 0 || performance[property] === '0') 
-      return res.status(400).json({error: 'Round, extra rep, minute, extra sec, kg, rep, meter, cal, or sec must > 0 or leave empty'})
+    if(performance[property] < 0/*  || performance[property] === '0' */) 
+      return res.status(400).json({error: 'Round, extra rep, minute, extra sec, kg, rep, meter, or cal must >= 0 or leave empty'})
       
-    if(!performance[property])performance[property]=null
+    // if(!performance[property])performance[property]=null  // not set null
   }
   if(tempWorkoutSum == 0) return res.status(400).json({error: 'At least one of the measures (Round, extra rep, minute, or extra sec) should > 0'})
-  if(tempPerformanceSum == 0) return res.status(400).json({error: 'At least one of the measures (Kg, rep, meter, cal, or sec) should > 0'})
+  if(tempPerformanceSum == 0) return res.status(400).json({error: 'At least one of the measures (Kg, rep, meter, or cal) should > 0'})
   let result = await Performance.createPerformacne(performance)
   res.json(result)
 }
@@ -70,45 +80,45 @@ const getPerformancesByCourseUser = async (req, res) => {
   res.json(result)
 }
 
-const getLeaderboardByWorkout = async (req, res) => {
-  let workout_id = req.params.workout_id
-  let arr = await Performance.getLeaderboardByWorkout(workout_id)
-  let obj = {}
+// const getLeaderboardByWorkout = async (req, res) => {
+//   let workout_id = req.params.workout_id
+//   let arr = await Performance.getLeaderboardByWorkout(workout_id)
+//   let obj = {}
 
-  for (let item of arr) {
-    let identifier = `${item.course_id} ${item.user_id}`
-    obj[identifier]={
-      round_ratio: item.round_ratio ? item.round_ratio : obj[identifier]?.round_ratio,
-      minute_ratio: item.minute_ratio ? item.minute_ratio : obj[identifier]?.minute,
-      kg_ratio: item.kg_ratio ? item.kg_ratio : obj[identifier]?.kg,
-      rep_ratio: item.rep_ratio ? item.rep_ratio : obj[identifier]?.rep_ratio,
-      meter_ratio: item.meter_ratio ? item.meter_ratio : obj[identifier]?.meter_ratio,
-      cal_ration: item.cal_ration ? item.cal_ration : obj[identifier]?.cal_ration
-    }
-  }
+//   for (let item of arr) {
+//     let identifier = `${item.course_id} ${item.user_id}`
+//     obj[identifier]={
+//       round_ratio: item.round_ratio ? item.round_ratio : obj[identifier]?.round_ratio,
+//       minute_ratio: item.minute_ratio ? item.minute_ratio : obj[identifier]?.minute,
+//       kg_ratio: item.kg_ratio ? item.kg_ratio : obj[identifier]?.kg,
+//       rep_ratio: item.rep_ratio ? item.rep_ratio : obj[identifier]?.rep_ratio,
+//       meter_ratio: item.meter_ratio ? item.meter_ratio : obj[identifier]?.meter_ratio,
+//       cal_ration: item.cal_ration ? item.cal_ration : obj[identifier]?.cal_ration
+//     }
+//   }
 
-  let courseUserArr = []
-  for (let property in obj) {
-    let course_id = property.substring(0, property.indexOf(' '))
-    let user_id = property.substring(property.indexOf(' ') + 1)
+//   let courseUserArr = []
+//   for (let property in obj) {
+//     let course_id = property.substring(0, property.indexOf(' '))
+//     let user_id = property.substring(property.indexOf(' ') + 1)
     
-    let courseUser = obj[property]
-    let rate = 1
-    for (let ratioProperty in courseUser) {
-      if(courseUser[ratioProperty]) rate *= parseFloat(courseUser[ratioProperty])
-    }
+//     let courseUser = obj[property]
+//     let rate = 1
+//     for (let ratioProperty in courseUser) {
+//       if(courseUser[ratioProperty]) rate *= parseFloat(courseUser[ratioProperty])
+//     }
 
-    courseUserArr.push({
-      course_id, 
-      user_id,
-      rate
-    })
-  }
+//     courseUserArr.push({
+//       course_id, 
+//       user_id,
+//       rate
+//     })
+//   }
 
-  courseUserArr.sort((a, b)=>b.rate - a.rate)
+//   courseUserArr.sort((a, b)=>b.rate - a.rate)
 
-  res.json(courseUserArr)
-}
+//   res.json(courseUserArr)
+// }
 
 
 const getLeaderboardByWorkouts = async (req, res) => {
@@ -119,59 +129,73 @@ const getLeaderboardByWorkouts = async (req, res) => {
   
   let leaderboardArr = []
   for (let id of workout_ids) {
-    let workout = await Performance.getWorkout(id)
-    let arr = await Performance.getLeaderboardByWorkout(id)
+
+    let workoutWithMovements = await Workout.getWorkout(id)
+
+    workoutWithMovements = workoutWithMovements[id]
+    let movementsLength = workoutWithMovements.movements.length
+
+
+    let arr = await Performance.getLeaderboardByWorkout(id, movementsLength)
+
+
     let obj = {}
     for (let item of arr) {
       let identifier = `${item.course_id} ${item.user_id}`
       obj[identifier]={
-        round_ratio: obj[identifier]?.round_ratio ? Math.min(obj[identifier].round_ratio, item.round_ratio) : item.round_ratio,
-        minute_ratio: obj[identifier]?.minute_ratio ? Math.min(obj[identifier].minute_ratio, item.minute_ratio) : item.minute_ratio,
-        kg_ratio: obj[identifier]?.kg_ratio ? Math.min(obj[identifier].kg_ratio, item.kg_ratio) : item.kg_ratio,
-        rep_ratio: obj[identifier]?.rep_ratio ? Math.min(obj[identifier].rep_ratio, item.rep_ratio): item.rep_ratio ,
-        meter_ratio: obj[identifier]?.meter_ratio ? Math.min(obj[identifier].meter_ratio, item.meter_ratio) : item.meter_ratio ,
-        cal_ration: obj[identifier]?.cal_ration ? Math.min(obj[identifier].cal_ration, item.cal_ration) : item.cal_ration 
-        // round_ratio: item.round_ratio ? item.round_ratio : obj[identifier]?.round_ratio,
-        // minute_ratio: item.minute_ratio ? item.minute_ratio : obj[identifier]?.minute,
-        // kg_ratio: item.kg_ratio ? item.kg_ratio : 1,
-        // rep_ratio: item.rep_ratio ? item.rep_ratio : 1,
-        // meter_ratio: item.meter_ratio ? item.meter_ratio : 1,
-        // cal_ration: item.cal_ration ? item.cal_ration : 1
-        // kg_ratio: item.kg_ratio ? Math.pow(item.kg_ratio * obj[identifier]?.kg_ratio, 0.5) : 1, // obj[identifier]?.kg_ratio,
-        // rep_ratio: item.rep_ratio ? Math.pow(item.rep_ratio * obj[identifier]?.rep_ratio, 0.5) : 1, // obj[identifier]?.rep_ratio,
-        // meter_ratio: item.meter_ratio ? Math.pow(item.meter_ratio * obj[identifier]?.meter_ratio, 0.5) : 1, // obj[identifier]?.meter_ratio,
-        // cal_ration: item.cal_ration ? Math.pow(item.cal_ration * obj[identifier]?.cal_ration, 0.5) : 1, // obj[identifier]?.cal_ration
-        // kg_ratio: item.kg_ratio ? item.kg_ratio : obj[identifier]?.kg_ratio,
-        // rep_ratio: item.rep_ratio ? item.rep_ratio : obj[identifier]?.rep_ratio,
-        // meter_ratio: item.meter_ratio ? item.meter_ratio : obj[identifier]?.meter_ratio,
-        // cal_ration: item.cal_ration ? item.cal_ration : obj[identifier]?.cal_ration
+        name: item.name,
+        ratio: obj[identifier]?.ratio  ?  obj[identifier].ratio * item.ratio : item.ratio,
+        round_m: item.round_m,
+        minute_m: item.minute_m,
+        kg_m: obj[identifier]?.kg_m  ?  obj[identifier].kg_m * item.kg_m : item.kg_m,
+        rep_m: obj[identifier]?.rep_m  ?  obj[identifier].rep_m * item.rep_m : item.rep_m,
+        meter_m: obj[identifier]?.meter_m  ?  obj[identifier].meter_m * item.meter_m : item.meter_m,
+        cal_m: obj[identifier]?.cal_m  ?  obj[identifier].cal_m * item.cal_m : item.cal_m,
       }
     }
   
-    let courseUserArr = []
-    for (let property in obj) {
-      let course_id = property.substring(0, property.indexOf(' '))
-      let user_id = property.substring(property.indexOf(' ') + 1)
+    //console.log(obj)
+
+    let LeadersArr = []
+    for (let identifier in obj) {
+      let course_id = identifier.substring(0, identifier.indexOf(' '))
+      let user_id = identifier.substring(identifier.indexOf(' ') + 1)
+
+      let leaderData = obj[identifier]
+
+      let score = leaderData.ratio * leaderData.round_m * leaderData.minute_m * 100
+      let name = leaderData.name 
+      let round = leaderData.round_m * 100
+      let minute = leaderData.minute_m * 100
+      let kg = leaderData.kg_m * 100
+      let rep = leaderData.rep_m * 100
+      let meter = leaderData.meter_m * 100
+      let cal = leaderData.cal_m * 100
+      let other = leaderData.ratio * 100
+      let round_minute = leaderData.round_m * leaderData.minute_m * 100
       
-      let courseUser = obj[property]
-      let rate = 1
-      for (let ratioProperty in courseUser) {
-        if(courseUser[ratioProperty]) rate *= parseFloat(courseUser[ratioProperty])
-      }
-  
-      courseUserArr.push({
+      LeadersArr.push({
         workout_id: id,
         course_id, 
         user_id,
-        rate
+        score,
+        name,
+        round,
+        minute,
+        kg,
+        rep,
+        meter,
+        cal,
+        other,
+        round_minute
       })
     }
   
-    courseUserArr.sort((a, b)=>b.rate - a.rate)
+    LeadersArr.sort((a, b)=>b.score - a.score)
 
-    workout.leaders = courseUserArr
+    workoutWithMovements.leaders = LeadersArr
 
-    leaderboardArr.push(workout)
+    leaderboardArr.push(workoutWithMovements)
   }
 
   res.json(leaderboardArr)
@@ -194,7 +218,7 @@ module.exports = {
   getPerformanceWithMovementWorkoutName,
   getPerformanceByUserMovement,
   getPerformanceByMovement,
-  getLeaderboardByWorkout,
+  //getLeaderboardByWorkout,
   getLeaderboardByWorkouts,
   getLeader
 }

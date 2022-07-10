@@ -9,7 +9,7 @@ router.route('/performance/courseuser').get(wrapAsync(Performance.getPerformance
 router.route('/performance/movementworkoutname/:performance_id').get(wrapAsync(Performance.getPerformanceWithMovementWorkoutName));
 router.route('/performance/usermovement/:movement_id').get(wrapAsync(Performance.getPerformanceByUserMovement))
 router.route('/performance/movement/').get(wrapAsync(Performance.getPerformanceByMovement))
-router.route('/performance/leaderboard/workout/:workout_id').get(wrapAsync(Performance.getLeaderboardByWorkout));
+// router.route('/performance/leaderboard/workout/:workout_id').get(wrapAsync(Performance.getLeaderboardByWorkout));
 router.route('/performance/leaderboard/workout/').get(wrapAsync(Performance.getLeaderboardByWorkouts));
 router.route('/performance/leaderboard/leader/').get(wrapAsync(Performance.getLeader));
 

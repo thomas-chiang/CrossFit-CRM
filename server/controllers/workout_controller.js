@@ -16,7 +16,7 @@ const updateOnlyWorkout = async(req, res) => {
   let tempWorkoutSum = 0
   for (let property in updatedWorkout){
     if(updatedWorkout[property] > 0 && (property == 'round' || property == 'extra_count' || property == 'minute' || property == 'extra_sec')) tempWorkoutSum += updatedWorkout[property]
-    if(!updatedWorkout[property]) updatedWorkout[property] = null
+    // if(!updatedWorkout[property]) updatedWorkout[property] = null // not set null
   }
   if(tempWorkoutSum == 0) return res.status(400).json({error:'Aleast one of the measures (round, extra rep, minute, or extra sec) should > 0'})
 
@@ -47,10 +47,17 @@ const deleteWorkoutMovement = async (req, res) => {
 
 const updateWorkoutMovement = async (req, res) => {
   let workoutMovement = req.body
+  console.log(workoutMovement)
+
+  let tempMovementSum = 0
   for (let property in workoutMovement) {
-    if(workoutMovement[property] < 0 || workoutMovement[property] === '0') return res.status(400).json({error: 'Kg, rep, meter, cal, or sec must > 0'})
-    if(!workoutMovement[property]) workoutMovement[property] = null
+    if(workoutMovement[property] < 0 /* || workoutMovement[property] === '0' */) return res.status(400).json({error: 'Kg, rep, meter, or cal must >= 0'})
+    // if(!workoutMovement[property]) workoutMovement[property] = null // not set null
+    if(workoutMovement[property] > 0 && (property == 'kg' || property == 'rep' || property == 'meter' || property == 'cal')) 
+        tempMovementSum += workoutMovement[property]
   }
+  if(tempMovementSum == 0) return res.status(400).json({error: 'At least one of the measures (Kg, rep, meter, or cal) should > 0'})
+
   delete workoutMovement.name
   let result = await Workout.updateWorkoutMovement(workoutMovement)
   res.json(result)
@@ -75,14 +82,17 @@ const createWorkoutWithMovement = async (req, res) => {
   }
   if(tempWorkoutSum == 0) return res.status(400).json({error:'Aleast one of the measures (round, extra rep, minute, or extra sec) should > 0'})
    
-
+  let tempMovementSum = 0
   for (let movement of workout.movementArr) {
     for (let property in movement) {
-      if(movement[property] < 0 || movement[property] === '0') return res.status(400).json({error: 'Kg, rep, meter, cal, or sec must > 0'})
-      if(!movement[property]) movement[property] = null
+      if(movement[property] < 0 /* || movement[property] === '0' */) return res.status(400).json({error: 'Kg, rep, meter, or cal must > 0'})
+      // if(!movement[property]) movement[property] = null // not set null
+      if(movement[property] > 0 && (property == 'kg' || property == 'rep' || property == 'meter' || property == 'cal')) 
+        tempMovementSum += performance[property]
     }
   }
-  
+  if(tempMovementSum == 0) return res.status(400).json({error: 'At least one of the measures (Kg, rep, meter, or cal) should > 0'})
+
   let user = req.user
   workout.creator_id = user.id
   let result = await Workout.createWorkoutWithMovement(workout)
