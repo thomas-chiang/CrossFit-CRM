@@ -1,5 +1,17 @@
 const { pool } = require('./mysql_conn')
 
+const getDistinctWorkoutMovements = async (workout_id) => {
+  const [result] = await pool.query(`
+    select 
+      distinct workout_movement.movement_id,
+      movements.name
+    from workout_movement
+    left join movements on workout_movement.movement_id = movements.id
+    where workout_movement.workout_id =  ?
+  `,[workout_id])
+  return result;
+}
+
 const getWorkoutMovements = async (workout_id) => {
   const [result] = await pool.query(`
     select 
@@ -351,5 +363,6 @@ module.exports = {
   getWorkout,
   addWorkoutMovement,
   updateOnlyWorkout,
-  getWorkoutMovements
+  getWorkoutMovements,
+  getDistinctWorkoutMovements
 }

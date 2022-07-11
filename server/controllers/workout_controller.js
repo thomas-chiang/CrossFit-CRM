@@ -157,6 +157,11 @@ const deleteWorkoutWorkoutWithMovements = async (req, res) => {
   res.json(result)
 }
 
+const getDistinctWorkoutMovements = async (req, res) => {
+  let workout_id = req.params.workout_id
+  let result = await Workout.getDistinctWorkoutMovements(workout_id)
+  res.json(result)
+}
 
 module.exports = {
   // createWorkout,
@@ -174,5 +179,6 @@ module.exports = {
   getWorkout,
   addWorkoutMovement,
   updateOnlyWorkout,
-  getWorkoutMovements
+  getWorkoutMovements,
+  getDistinctWorkoutMovements
 }

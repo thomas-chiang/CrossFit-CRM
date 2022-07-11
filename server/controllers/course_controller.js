@@ -144,8 +144,9 @@ const getCourses = async (req, res) => {
           label: participant.name,
           value: participant.id
         }
-        if(participant.role === 2) coaches.push(participant)
-        if(participant.role === 1) members.push(participant)
+        //console.log(participant)
+        if(participant.role >= 2 && participant.is_coach == 1) coaches.push(participant)
+        if(participant.role >= 1 && participant.enrollment !== null) members.push(participant)
       }
       course.members = members.sort((a,b)=>a.enrollment - b.enrollment)
       let enrolledMembers = []

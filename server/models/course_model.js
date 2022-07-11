@@ -48,7 +48,7 @@ const quitMemberById = async (course_id, user_id, enrollment, creator_id) => {
   try{
     await conn.query('start transaction')
 
-    let [result] = await conn.query(`delete from course_user where course_id = ? and user_id = ?`, [course_id, user_id])
+    let [result] = await conn.query(`update course_user set enrollment = 0 where course_id = ? and user_id = ?`, [course_id, user_id])
 
     if (enrollment == 1){
       let [course_result] = await conn.query(`select * from courses where id = ?`,[course_id])
@@ -116,7 +116,7 @@ const enrollMemberByEmail = async (course_id, email, creator_id) => {
     await conn.query('start transaction')
 
     // check user status
-    let [user_result] = await conn.query(`select * from users where email = ? and role = 1`,[email])
+    let [user_result] = await conn.query(`select * from users where email = ?`,[email])
     if(user_result.length === 0) throw {message: 'no such email', status: 400}
 
     let validStatus = user_result[0].valid
@@ -332,6 +332,7 @@ const enroll = async (id, user) => {
     let [course_result] = await conn.query(`select * from courses where id = ?`,[id])
     let course_point = course_result[0].point
     let size = course_result[0].size
+
     let [size_enrolled_result] = await conn.query(
       `
         select course_user.* 
@@ -339,9 +340,11 @@ const enroll = async (id, user) => {
         left join users on course_user.user_id = users.id
         where course_user.course_id = ? 
         and course_user.enrollment = 1
-        and users.role = 1
       `,[id])
     let size_enrolled = size_enrolled_result.length
+    console.log(size)
+    console.log(size_enrolled)
+
     let [point_result] = await conn.query(`
       select
         IFNULL(sum(point),0) as point, 
@@ -413,9 +416,9 @@ const createCourse = async (course, coaches, members, workouts) => {
 
     if (coaches.length > 0) {
       for (let [index, coach] of coaches.entries()) {
-        coaches[index] = [course_id, coach.id]
+        coaches[index] = [course_id, coach.id, 1]
       }
-      await conn.query('INSERT INTO course_user (course_id, user_id) VALUES ?', [coaches]);
+      await conn.query('INSERT INTO course_user (course_id, user_id, is_coach) VALUES ?', [coaches]);
     }
 
     
@@ -457,17 +460,48 @@ const updateCourse = async (course, coaches, workouts) => {
     // start lock
     await conn.query('update semaphore set record = record + 1 where course_id = ?', [course_id])
 
-    // update course
-    await conn.query(`UPDATE courses SET ? WHERE id = ? `, [course, course_id])
+    // check if can update point or size
+    let [original_enrolled] = await conn.query(`select * from course_user where course_id = ? and enrollment = 1`, [course_id])
+    let [original_waiting] = await conn.query(`select * from course_user where course_id = ? and enrollment > 1`, [course_id])
 
-    // delete and readd coaches
-    await conn.query(`delete from course_user where course_id = ? and enrollment is null`, [course_id])
-    if (coaches.length > 0) {
-      for (let [index, coach] of coaches.entries()) {
-        coaches[index] = [course_id, coach.id]
-      }
-      await conn.query('INSERT INTO course_user (course_id, user_id) VALUES ?', [coaches]);
+    let [course_result] = await conn.query(`select * from courses where id = ?`,[course_id])
+    let original_point = course_result[0].point
+    let original_size =  course_result[0].size
+
+    if (original_enrolled.length > 0 && course.point != original_point) throw {message: 'You cannot update point when users have enrolled this course', status: 400}
+    if (original_waiting.length > 0 && course.size > original_size) throw {message: 'You cannot increase size when there are users waiting for this course', status: 400}
+    if (original_enrolled.length > 0 && course.size < original_size) throw {message: 'You cannot decrease size when there are users enrolled for this course', status: 400}
+
+    // update course
+    let [result] = await conn.query(`UPDATE courses SET ? WHERE id = ? `, [course, course_id])
+
+    // check original coaches and generate "original_coach_ids" arr
+    let [original_coaches] = await conn.query(`select * from course_user where course_id = ? and is_coach = 1`, [course_id])
+    let original_coach_ids = []
+    for ( let item of original_coaches) {
+      original_coach_ids.push(item.user_id)
     }
+    
+    // create coaches_to_be_added
+    let coaches_to_be_added = coaches.filter(item => !original_coach_ids.includes(item.id))
+    // add new coaches
+    if (coaches_to_be_added.length > 0) {
+      for (let [index, coach] of coaches_to_be_added.entries()) {
+        coaches_to_be_added[index] = [course_id, coach.id, 1]
+      }
+      await conn.query('INSERT INTO course_user (course_id, user_id, is_coach) VALUES ?', [coaches_to_be_added]);
+    }
+
+    // set all course users' is_coach = 0
+    await conn.query(`update course_user set is_coach = 0 where course_id = ?`, [course_id])
+
+    // update is_coach = 1 according to all couches input
+    let coach_ids = []
+    for (let item of coaches) {
+      coach_ids.push(item.id)
+    }
+    await conn.query(`update course_user set is_coach = 1 where user_id in ( ? ) `, [coach_ids])
+
 
     // delete and readd workouts
     await conn.query(`delete from course_workout where course_id = ?`, [course_id])    
@@ -478,10 +512,10 @@ const updateCourse = async (course, coaches, workouts) => {
       await conn.query('INSERT INTO course_workout (course_id, workout_id) VALUES ?', [workouts]);
     }
 
-
-     // get course points
-     let [course_result] = await conn.query(`select * from courses where id = ?`,[course_id])
-     let course_point = course_result[0].point
+    /* 
+    // get course points
+    let [course_result] = await conn.query(`select * from courses where id = ?`,[course_id])
+    let course_point = course_result[0].point
 
     
     // check originally enrolled and waiting users with enough points
@@ -522,10 +556,10 @@ const updateCourse = async (course, coaches, workouts) => {
       await conn.query(`delete from course_user where course_id = ? and enrollment >= 1`, [course_id])
       await conn.query('INSERT INTO course_user (course_id, user_id, enrollment) VALUES ?', [course_users]);
     }
-    
-
+    */
     await conn.query('commit')
-    return {new_enrolled_users, new_canceled_users}
+    //return {new_enrolled_users, new_canceled_users}
+    return result
   }catch(error){
     await conn.query('rollback')
     console.log(error)
@@ -550,7 +584,8 @@ const getCourses = async () => {
       workouts.minute as workout_minute,
       workouts.extra_sec as workout_extra_sec,
       workouts.note as workout_note,
-      course_user.enrollment as enrollment
+      course_user.enrollment as enrollment,
+      course_user.is_coach
     from courses 
     left join course_user on courses.id = course_user.course_id
     left join users on course_user.user_id = users.id 
@@ -569,7 +604,8 @@ const getCourses = async () => {
             id: item.user_id,
             role: item.role,
             name: item.user_name,
-            enrollment: item.enrollment
+            enrollment: item.enrollment,
+            is_coach: item.is_coach
           }
         }
       }
@@ -614,7 +650,8 @@ const getCourses = async () => {
               id: item.user_id,
               role: item.role,
               name: item.user_name,
-              enrollment: item.enrollment
+              enrollment: item.enrollment,
+              is_coach: item.is_coach
             }
           }
         }

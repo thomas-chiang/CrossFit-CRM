@@ -5,6 +5,31 @@ const getWorkout = async (workout_id) => {
   return result[0]
 }
 
+const getPerformanceByWorkoutMovement = async (user_id, workout_id, movement_id)=> {
+  const [result] = await pool.query(`
+    SELECT 
+      performances.kg,
+      performances.rep,
+      performances.meter,
+      performances.cal,
+      performances.round,
+      performances.minute,
+      performances.extra_count,
+      performances.extra_sec,
+      courses.start,
+      workouts.name as workout_name
+    FROM performances
+    left join courses on performances.course_id = courses.id
+    left join workouts on performances.workout_id = workouts.id
+    where performances.user_id = ?
+    and performances.workout_id = ?
+    and performances.movement_id = ?
+    ORDER BY courses.start ASC
+  `,[user_id, workout_id, movement_id])
+
+  return result
+}
+
 const getPerformanceByUserMovement = async (user_id, movement_id)=> {
   const [result] = await pool.query(`
     SELECT 
@@ -141,6 +166,19 @@ const getLeader = async (course_id, user_id, workout_id) => {
   return result
 }
 
+const getUserWorkouts = async (user_id) => {
+  const [result] = await pool.query(`
+    select 
+      distinct performances.workout_id, 
+      workouts.name 
+    from performances 
+    left join workouts on performances.workout_id = workouts.id
+    where user_id = ?
+  `,[user_id]);
+
+  return result
+}
+
 module.exports = {
   createPerformacne,
   getPerformacnes,
@@ -151,5 +189,7 @@ module.exports = {
   getPerformanceByUserMovement,
   getLeaderboardByWorkout,
   getWorkout,
-  getLeader
+  getLeader,
+  getUserWorkouts,
+  getPerformanceByWorkoutMovement
 };

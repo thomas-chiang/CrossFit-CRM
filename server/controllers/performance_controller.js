@@ -1,6 +1,15 @@
 const Performance = require('../models/performance_model')
 const Workout = require('../models/workout_model')
 
+const getPerformanceByWorkoutMovement = async (req, res) => {
+  let user_id = req.query.user_id
+  let workout_id = req.query.workout_id
+  let movement_id = req.query.movement_id
+
+  let result = await Performance.getPerformanceByWorkoutMovement(user_id, workout_id, movement_id)
+  res.json(result)
+}
+
 const getPerformanceByMovement = async (req, res) => {
   let user_id = req.query.user_id
   let movement_id = req.query.movement_id
@@ -210,6 +219,12 @@ const getLeader = async (req, res) => {
   res.json(result)
 }
 
+const getUserWorkouts = async (req, res) => {
+  let user_id = req.params.user_id
+  let result = await Performance.getUserWorkouts(user_id)
+  res.json(result)
+}
+
 module.exports = {
   createPerformance,
   getPerformancesByCourseUser,
@@ -220,5 +235,7 @@ module.exports = {
   getPerformanceByMovement,
   //getLeaderboardByWorkout,
   getLeaderboardByWorkouts,
-  getLeader
+  getLeader,
+  getUserWorkouts,
+  getPerformanceByWorkoutMovement
 }

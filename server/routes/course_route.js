@@ -6,8 +6,8 @@ router.route('/course').post(authenticate('gym'), isValid(), wrapAsync(Course.cr
 router.route('/course').get(wrapAsync(Course.getCourses));
 router.route('/course').put(authenticate('gym'), isValid(), wrapAsync(Course.updateCourse));
 router.route('/course/delete/:id').delete(authenticate('gym'), isValid(), wrapAsync(Course.deleteCourse));
-router.route('/course/enroll/:id').post(authenticate('only member'), isValid(), wrapAsync(Course.enroll));
-router.route('/course/enroll/:id').delete(authenticate('only member'), isValid(), wrapAsync(Course.quit));
+router.route('/course/enroll/:id').post(authenticate('member'), isValid(), wrapAsync(Course.enroll));
+router.route('/course/enroll/:id').delete(authenticate('member'), isValid(), wrapAsync(Course.quit));
 //router.route('/course/performance').post(authenticate('coach'), isValid(), wrapAsync(Course.createPerformance)); /////////
 //router.route('/course/performance').put(authenticate('coach'), isValid(), wrapAsync(Course.updatePerformance));
 //router.route('/course/performance').get(wrapAsync(Course.getPerformaces));

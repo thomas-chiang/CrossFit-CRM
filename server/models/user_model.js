@@ -51,7 +51,7 @@ const getUsersByRole = async (role) => {
       from points
       group by user_id
     ) sum_points on sum_points.user_id = users.id 
-    where role = ?
+    where role between ? and 3
   `, [ role ]);
   return users
 }
@@ -120,7 +120,7 @@ const getGymsByUser = async (user) => {
 const getValidCoaches = async () => {
   const [coaches] = await pool.query(`
     select id, name from users 
-    where role = 2
+    where role > 1
     and valid = 1
   `)
 
@@ -142,6 +142,16 @@ const updateValidStatus = async (user_id, valid_status) => {
     set valid = ? 
     where id = ?
   `,[valid_status, user_id])
+
+  return result
+}
+
+const updateRole = async (user_id, role) => {
+  let [result] = await pool.query(`
+    update users
+    set role = ? 
+    where id = ?
+  `,[role, user_id])
 
   return result
 }
@@ -188,4 +198,5 @@ module.exports = {
   getVaidStatus,
   updatePoint,
   insertPoint,
+  updateRole
 }

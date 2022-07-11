@@ -67,8 +67,18 @@ const getUsersByRole = async (req, res) => {
   let role = req.params.role
   let users = await User.getUsersByRole(role)
   for (let user of users) {
-    user.value = user.id
-    user.label = user.name
+    user.value = user.role
+    switch(user.role) {
+      case 1:
+        user.label = 'Member'
+        break
+      case 2:
+        user.label = 'Coach'
+        break
+      case 3:
+        user.label = 'Owner'
+        break
+    }
   }
   res.status(200).json(users);
 };
@@ -112,6 +122,7 @@ const getValidCoaches = async (req, res) => {
   res.status(200).json(coaches)
 }
 
+
 const getCoaches = async (req, res) => {
   let coaches = await User.getCoaches()
   for (let coach of coaches) {
@@ -126,6 +137,14 @@ const updateValidStatus = async (req, res) => {
   let user_id = req.query.user_id
   let valid_status = req.query.valid_status
   let result = await User.updateValidStatus(user_id, valid_status)
+
+  res.status(200).json(result)
+}
+
+const updateRole = async (req, res) => {
+  let user_id = req.query.user_id
+  let role = req.query.role
+  let result = await User.updateRole(user_id, role)
 
   res.status(200).json(result)
 }
@@ -169,4 +188,5 @@ module.exports = {
   updateValidStatus,
   updatePoint,
   insertPoint,
+  updateRole
 };

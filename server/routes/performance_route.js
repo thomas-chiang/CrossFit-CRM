@@ -12,6 +12,10 @@ router.route('/performance/movement/').get(wrapAsync(Performance.getPerformanceB
 // router.route('/performance/leaderboard/workout/:workout_id').get(wrapAsync(Performance.getLeaderboardByWorkout));
 router.route('/performance/leaderboard/workout/').get(wrapAsync(Performance.getLeaderboardByWorkouts));
 router.route('/performance/leaderboard/leader/').get(wrapAsync(Performance.getLeader));
+router.route('/performance/workouts/:user_id').get(wrapAsync(Performance.getUserWorkouts));
+router.route('/performance/workoutmovement/').get(wrapAsync(Performance.getPerformanceByWorkoutMovement))
+
+
 
 
 module.exports = router;

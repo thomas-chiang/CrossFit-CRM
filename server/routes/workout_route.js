@@ -20,6 +20,7 @@ router.route('/workout/onlyworkout').put(authenticate('coach'), isValid(), wrapA
 
 router.route('/workout/workout/:workout_id').delete(authenticate('coach'), isValid(), wrapAsync(Workout.deleteWorkout));
 router.route('/workout/workoutmovements/:workout_id').get(wrapAsync(Workout.getWorkoutMovements));
+router.route('/workout/distinctworkoutmovements/:workout_id').get(wrapAsync(Workout.getDistinctWorkoutMovements));
 
 
 
