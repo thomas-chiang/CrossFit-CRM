@@ -23,7 +23,10 @@ app.use('/api/', [
 app.use(function (err, req, res, next) {
   console.log(err);
   if(err.sql) {
-    console.log(`Sql error: `+err.message);
+    if(err.errno == 1451) {
+      if(err.sqlMessage.includes('performance')) return res.status(400).json({error: 'There is user using this item for recording performances. Please delete the related performances first'})
+      if(err.sqlMessage.includes('workout')) return res.status(400).json({error: 'There is workout using this item. Please remove the item from the related workout first'})
+    }
     return res.status(400).json({error: err.sqlMessage})
   }
   if(err.status === 400) return res.status(400).json({error: err.message})

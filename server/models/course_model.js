@@ -63,7 +63,7 @@ const quitMemberById = async (course_id, user_id, enrollment, creator_id) => {
       }
       await conn.query('insert into points set ?', [pointObj])
 
-
+/* 
       // check if there is next user
       let [next_users_result] = await conn.query(` 
         select 
@@ -88,17 +88,65 @@ const quitMemberById = async (course_id, user_id, enrollment, creator_id) => {
         let next_user_id = next_users_result[0].user_id
 
         let pointObj = {
-          course_id: id,
+          course_id: course_id,
           point_to_be_deducted: course_point,
           user_id: next_user_id,
-          creator_id: user.id,
+          creator_id: creator_id,
         }
         
         await conn.query('update course_user set enrollment = 1 where course_id = ? and user_id = ?', [id, next_user_id])
         await conn.query('insert into points set ?', [pointObj])
       }
+ */
+
     }
     
+    await conn.query('commit')
+    return result
+  }catch(error){
+    await conn.query('rollback')
+    console.log(error)
+    throw error
+  }finally{
+    await conn.release()
+  }
+}
+
+const enrollMemberByExistingUserId  = async (course_id, user_id, creator_id) => {
+  const conn = await pool.getConnection()
+  try{
+    await conn.query('start transaction')
+
+    // check point status
+    let [points_result] = await conn.query(`
+      select
+        IFNULL(sum(point),0) as point, 
+        IFNULL(sum(point_to_be_deducted),0) as point_to_be_deducted
+      from points
+      where user_id = ?
+    `,[user_id])
+
+    let points_available = points_result[0].point - points_result[0].point_to_be_deducted
+
+    let [course_result] = await conn.query(`select * from courses where id = ?`,[course_id])
+    let course_point = course_result[0].point
+
+    // points enough
+    if(course_point > points_available) throw {message: 'do not have enough points', status: 400}
+    let pointObj = {
+      course_id: course_id,
+      point_to_be_deducted: course_point,
+      user_id: user_id,
+      creator_id: creator_id,
+    }
+    await conn.query('insert into points set ?', [pointObj])
+
+
+    // update enrollment to 1
+    let [result] = await conn.query(`
+      update course_user set enrollment = 1 where course_id = ? and user_id = ? 
+    `,[course_id, user_id])
+
     await conn.query('commit')
     return result
   }catch(error){
@@ -657,5 +705,6 @@ module.exports = {
   getCourseEnrolledmembers,
   enrollMemberByEmail,
   quitMemberById,
-  checkoutMemberById
+  checkoutMemberById,
+  enrollMemberByExistingUserId
 }

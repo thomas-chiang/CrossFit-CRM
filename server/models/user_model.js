@@ -182,6 +182,39 @@ const insertPoint = async (user_id, point, creator_id, time) => {
   return result
 }
 
+const getAvailablePointsByUser = async (user_id) => {
+  const [result] = await pool.query(`
+    select 
+      user_id, 
+      ifnull(sum(point),0) - ifnull(sum(point_to_be_deducted),0) as available_point
+    from points
+    where user_id = ?
+    group by user_id
+  `, [ user_id ]);
+  return result[0].available_point
+}
+
+
+const getPointsByUser = async (user_id) => {
+  const [result] = await pool.query(`
+    select 
+      points.id,
+      users.name as point_modifier,
+      users.role,
+      points.time,
+      points.point,
+      points.point_to_be_deducted as unchecked_point,
+      courses.title as course_title,
+      courses.start as course_time
+    from points
+    left join users on points.creator_id = users.id
+    left join courses on points.course_id = courses.id
+    where points.user_id = ?
+    order by points.id desc
+  `, [ user_id ]);
+  return result
+}
+
 
 module.exports = {
   signUp,
@@ -198,5 +231,7 @@ module.exports = {
   getVaidStatus,
   updatePoint,
   insertPoint,
-  updateRole
+  updateRole,
+  getAvailablePointsByUser,
+  getPointsByUser
 }

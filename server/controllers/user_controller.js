@@ -4,11 +4,13 @@ const jwt = require('jsonwebtoken');
 const validator = require('validator');
 const User = require('../models/user_model');
 const bcrypt = require('bcrypt');
+const moment = require('moment');
 
 const signUp = async (req, res) => {
   //check input format
   let {name, email, password, gender, role} = req.body;
   if(!name || !email || !password || !gender || !role) return res.status(400).json({error:'Request Error: name, email, gender, role, and password are required.'})
+  if(name.length > 20 || password.length > 20) return res.status(400).json({error:'Name or password cannot be more than 20 characters'})
   if (!validator.isEmail(email)) return res.status(400).json({error:'Request Error: Invalid email format'})
   
   //handle input
@@ -161,6 +163,14 @@ const insertPoint = async (req, res) => {
   let creator_id = req.user.id
   let user_id = req.query.user_id
   let point = req.query.point
+  let behavior = req.query.behavior
+  if (point==0 || (point < 0 && behavior == 'add') || (point > 0 && behavior == 'deduct')) return res.status(400).json({error:'Points must > 0'})
+  if (Math.abs(point) > 10000) return res.status(400).json({error:'You can only add or deduct 10000 points each time'})
+  if ( behavior == 'deduct' ) {
+    let available_point = await User.getAvailablePointsByUser(user_id)
+    if (parseInt(available_point) + parseInt(point) < 0) return res.status(400).json({error:'Cannot deduct more than available points'})
+  }
+
   let time = new Date()
   let result = await User.insertPoint(user_id, point, creator_id, time)
 
@@ -173,6 +183,32 @@ const insertPoint = async (req, res) => {
   
 //   res.status(200).json(result)
 // }
+
+const getPointsByUser = async (req, res) => {
+  let user_id = req.params.user_id
+  let result = await User.getPointsByUser(user_id)
+  for (let item of result) {
+    item.time = moment(item.time).local().format('YYYY/MM/DD H:mm:ss A')
+    if(item.course_time) item.course_time = moment(item.course_time).local().format('YYYY/MM/DD H:mm:ss A')
+    switch(item.role) {
+      case 1: 
+        item.role = 'Member'
+        break
+      case 2: 
+        item.role = 'Coach'
+        break
+      case 3: 
+        item.role = 'Owner'
+        break
+      default: 
+        item.role = 'Member'   
+    }
+  }
+
+
+  res.status(200).json(result)
+}
+
 
 
 module.exports = {
@@ -188,5 +224,6 @@ module.exports = {
   updateValidStatus,
   updatePoint,
   insertPoint,
-  updateRole
+  updateRole,
+  getPointsByUser
 };

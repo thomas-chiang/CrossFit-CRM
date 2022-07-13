@@ -21,6 +21,17 @@ const quitMemberById = async (req, res) => {
   res.json(result)
 }
 
+
+const enrollMemberByExistingUserId = async (req, res) => {
+  let creator_id = req.user.id
+  let user_id = req.query.user_id
+  let course_id = req.query.course_id
+  if(!course_id) return res.status(500).json({error:'Server Error: Please refresh page or reach out to IT'})
+  let result = await Course.enrollMemberByExistingUserId(course_id, user_id, creator_id)
+  res.json(result)
+}
+
+
 const enrollMemberByEmail = async (req, res) => {
   let creator_id = req.user.id
   let email = req.query.email
@@ -197,5 +208,6 @@ module.exports = {
   getCourseEnrolledmembers,
   enrollMemberByEmail,
   quitMemberById,
-  checkoutMemberById
+  checkoutMemberById,
+  enrollMemberByExistingUserId
 }
