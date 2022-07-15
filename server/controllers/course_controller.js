@@ -36,9 +36,9 @@ const enrollMemberByEmail = async (req, res) => {
   let creator_id = req.user.id
   let email = req.query.email
   let course_id = req.query.course_id
-  if(!email) return res.status(400).json({error:'Request Error: email is required.'})
+  if(!email) return res.status(400).json({error:'Email is required.'})
   if(!course_id) return res.status(500).json({error:'Server Error: Please refresh page or reach out to IT'})
-  if(!validator.isEmail(email)) return res.status(400).json({error:'Request Error: Invalid email format'})
+  if(!validator.isEmail(email)) return res.status(400).json({error:'Invalid email format'})
   let result = await Course.enrollMemberByEmail(course_id, email, creator_id)
   res.json(result)
 }
@@ -49,31 +49,6 @@ const getCourseEnrolledmembers = async (req, res) => {
   res.json(result)
 }
 
-// const deletePerformance = async (req, res) => {
-//   let performance = req.body
-//   let result = await Course.deletePerformance(performance)
-//   res.json(result)
-// }
-
-// const updatePerformance = async (req, res) => {
-//   let performance = req.body
-//   delete performance.name
-//   let result = await Course.updatePerformance(performance)
-//   res.json(result)
-// }
-
-// const getPerformaces = async (req, res) => {
-//   let user_id = req.query.user_id
-//   let course_id = req.query.course_id
-//   let performances = await Course.getPerformaces(course_id, user_id)
-//   res.json(performances)
-// }
-
-// const createPerformance = async (req, res) => {
-//   let performance = req.body
-//   let result = await Course.createPerformance(performance)
-//   res.json(result)
-// }
 
 const quit = async (req, res) => {
   let id = req.params.id
@@ -155,7 +130,7 @@ const getCourses = async (req, res) => {
           label: participant.name,
           value: participant.id
         }
-        //console.log(participant)
+    
         if(participant.role >= 2 && participant.is_coach == 1) coaches.push(participant)
         if(participant.role >= 1 && participant.enrollment !== null) members.push(participant)
       }

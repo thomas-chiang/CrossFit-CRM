@@ -9,9 +9,9 @@ const moment = require('moment');
 const signUp = async (req, res) => {
   //check input format
   let {name, email, password, gender, role} = req.body;
-  if(!name || !email || !password || !gender || !role) return res.status(400).json({error:'Request Error: name, email, gender, role, and password are required.'})
+  if(!name || !email || !password || !gender || !role) return res.status(400).json({error:'Name, email, gender, role, and password are required.'})
   if(name.length > 20 || password.length > 20) return res.status(400).json({error:'Name or password cannot be more than 20 characters'})
-  if (!validator.isEmail(email)) return res.status(400).json({error:'Request Error: Invalid email format'})
+  if (!validator.isEmail(email)) return res.status(400).json({error:'Invalid email format'})
   
   //handle input
   let user = req.body
@@ -35,12 +35,12 @@ const signUp = async (req, res) => {
 const signIn = async (req, res) => { 
   //check input format
   let {email, password, role} = req.body;
-  if(!email || !password || !role) return res.status(400).json({error:'Request Error: role, email, and password are required.'})
-  if(!validator.isEmail(email)) return res.status(400).json({error:'Request Error: Invalid email format'})
+  if(!email || !password || !role) return res.status(400).json({error:'Role, email, and password are required.'})
+  if(!validator.isEmail(email)) return res.status(400).json({error:'Invalid email format'})
   
   //query db & validate
   let result = await User.signIn(role, email)
-  if(!result.user || !bcrypt.compareSync(password, result.user.password)) return res.status(400).json({error:'Request Error: Invalid email or password'})
+  if(!result.user || !bcrypt.compareSync(password, result.user.password)) return res.status(400).json({error:'Invalid email or password'})
   let user = result.user
 
   //handle output
@@ -188,7 +188,9 @@ const getPointsByUser = async (req, res) => {
   let user_id = req.params.user_id
   let result = await User.getPointsByUser(user_id)
   for (let item of result) {
+    //console.log(item.time)
     item.time = moment(item.time).local().format('YYYY/MM/DD H:mm:ss A')
+    //console.log(item.time)
     if(item.course_time) item.course_time = moment(item.course_time).local().format('YYYY/MM/DD H:mm:ss A')
     switch(item.role) {
       case 1: 

@@ -18,6 +18,7 @@ const checkoutMemberById = async (course_id, user_id, enrollment, creator_id) =>
         point_to_be_deducted: - course_point,
         user_id: user_id,
         creator_id: creator_id,
+        time: new Date()
       }
       await conn.query('insert into points set ?', [pointObj])
 
@@ -27,6 +28,7 @@ const checkoutMemberById = async (course_id, user_id, enrollment, creator_id) =>
         point: - course_point,
         user_id: user_id,
         creator_id: creator_id,
+        time: new Date()
       }
       await conn.query('insert into points set ?', [pointObj])
     }
@@ -60,6 +62,7 @@ const quitMemberById = async (course_id, user_id, enrollment, creator_id) => {
         point_to_be_deducted: - course_point,
         user_id: user_id,
         creator_id: creator_id,
+        time: new Date()
       }
       await conn.query('insert into points set ?', [pointObj])
 
@@ -138,6 +141,7 @@ const enrollMemberByExistingUserId  = async (course_id, user_id, creator_id) => 
       point_to_be_deducted: course_point,
       user_id: user_id,
       creator_id: creator_id,
+      time: new Date()
     }
     await conn.query('insert into points set ?', [pointObj])
 
@@ -172,8 +176,8 @@ const enrollMemberByEmail = async (course_id, email, creator_id) => {
     
     let user_id = user_result[0].id
 
-    let [course_user_result] = await conn.query(`select * from course_user where course_id = ? and user_id = ?`, [course_id, user_id])
-    if (course_user_result.length > 0) throw {message: 'Member is already on enrollment list. Please quit the member first', status: 400}
+    let [course_user_result] = await conn.query(`select * from course_user where course_id = ? and user_id = ? and enrollment >= 0`, [course_id, user_id])
+    if (course_user_result.length > 0) throw {message: 'Member is already on enrollment list.', status: 400}
 
     // check point status
     let [points_result] = await conn.query(`
@@ -196,17 +200,29 @@ const enrollMemberByEmail = async (course_id, email, creator_id) => {
       point_to_be_deducted: course_point,
       user_id: user_id,
       creator_id: creator_id,
+      time: new Date()
     }
     await conn.query('insert into points set ?', [pointObj])
 
 
-    // update enrollment to 1
-    let [result] = await conn.query(`
-      insert into course_user (course_id, user_id, enrollment) values (?, ?, ?)
-    `,[course_id, user_id, 1])
+    // Check if on the list
+    let result
+    let [listed_user_result] = await conn.query(`select * from course_user where course_id = ? and user_id = ?`, [course_id, user_id])
+    if (listed_user_result.length > 0) {
+      result = await conn.query(`
+        update course_user set enrollment = 1 where course_id = ? and user_id = ? 
+      `,[course_id, user_id])
+    } else {
+      result = await conn.query(`
+        insert into course_user (course_id, user_id, enrollment) values (?, ?, ?)
+      `,[course_id, user_id, 1])
+    }
+
+
+    
 
     await conn.query('commit')
-    return result
+    return result[0]
   }catch(error){
     await conn.query('rollback')
     console.log(error)
@@ -233,46 +249,7 @@ const getCourseEnrolledmembers = async (course_id) => {
   return result
 }
 
-// const deletePerformance = async (performance) => {
-//   const [result] = await pool.query(`
-//     delete from course_user_workout 
-//     where
-//       course_id = ?
-//       and user_id = ?
-//       and workout_id = ?
-//   `, [performance.course_id, performance.user_id, performance.workout_id])
-//   return result
-// }
 
-// const updatePerformance = async (performance) => {
-//   const [result] = await pool.query(`
-//     UPDATE course_user_workout SET ? 
-//     where 
-//       course_id = ?
-//       and user_id = ?
-//       and workout_id = ?
-//   `, [performance, performance.course_id, performance.user_id, performance.workout_id])
-//   return result
-// }
-
-// const getPerformaces = async (course_id, user_id) => {
-//   const [performances] = await pool.query(`
-//     select 
-//       course_user_workout.*,
-//       workouts.name
-//     from course_user_workout
-//     left join workouts on course_user_workout.workout_id = workouts.id
-//     where course_id = ? and user_id = ? 
-//   `,[course_id, user_id])
-
-//   return performances
-// }
-
-// const createPerformance = async (performance) => {
-//   console.log(performance)
-//   const [result] = await pool.query('INSERT INTO course_user_workout SET ? ', [performance])
-//   return result
-// }
 
 const quit = async (id, user) => {
   const conn = await pool.getConnection()
@@ -302,7 +279,7 @@ const quit = async (id, user) => {
     
     await conn.query('update course_user set enrollment = 0 where course_id = ? and user_id = ?', [id, user.id])
     
-
+    console.log(course_user_enrollment)
     
     // next user
     let next_user_id = 0
@@ -313,6 +290,7 @@ const quit = async (id, user) => {
         point_to_be_deducted: - course_point,
         user_id: user.id,
         creator_id: user.id,
+        time: new Date()
       }
       await conn.query('insert into points set ?', [pointObj])
       // check next users with "enough points"
@@ -342,6 +320,7 @@ const quit = async (id, user) => {
           point_to_be_deducted: course_point,
           user_id: next_user_id,
           creator_id: user.id,
+          time: new Date()
         }
 
         await conn.query('update course_user set enrollment = 1 where course_id = ? and user_id = ?', [id, next_user_id])
@@ -418,6 +397,7 @@ const enroll = async (id, user) => {
       point_to_be_deducted: course_point,
       user_id: user.id,
       creator_id: user.id,
+      time: new Date()
     }
     if(size_enrolled < size) { 
       // having avaliable spots
@@ -434,7 +414,7 @@ const enroll = async (id, user) => {
     } else { 
       // no avaliable spot
       if(enrollButQuit_user_id == 0) result = await conn.query('INSERT INTO course_user (course_id, user_id, enrollment) VALUES (?, ?, ?)', [id, user.id, new Date().getTime()]); // user did not enrolled in the past
-      else result = await conn.query('update course_user set enrollment = ? where course_id = ? and user_id = ?', [new Date().getTime(), id, enrollButQuit_user_id]);// user did enrolled but quit in the past
+      else result = await conn.query('update course_user set enrollment = ? where course_id = ? and user_id = ?', [new Date().getTime(), id, enrollButQuit_user_id]);// user did enrolled but quit in the past      
     }
 
     await conn.query('commit')
@@ -675,7 +655,7 @@ const deleteCourse = async (id) => {
   try{
     await conn.query('start transaction')
 
-    await conn.query(`delete from course_user where course_id = ?`, [id])
+    //await conn.query(`delete from course_user where course_id = ?`, [id])
     await conn.query(`delete from course_workout where course_id = ?`, [id])
     await conn.query(`delete from performances where course_id = ?`, [id])
     let result = await conn.query(`delete from courses where id = ?`, [id])

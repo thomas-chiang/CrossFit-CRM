@@ -14,6 +14,7 @@ router.route('/performance/leaderboard/workout/').get(wrapAsync(Performance.getL
 router.route('/performance/leaderboard/leader/').get(wrapAsync(Performance.getLeader));
 router.route('/performance/workouts/:user_id').get(wrapAsync(Performance.getUserWorkouts));
 router.route('/performance/workoutmovement/').get(wrapAsync(Performance.getPerformanceByWorkoutMovement))
+router.route('/performance/analysis/').get(wrapAsync(Performance.getPerformanceByWorkout));
 
 
 

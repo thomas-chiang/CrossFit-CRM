@@ -1,14 +1,7 @@
 const Performance = require('../models/performance_model')
 const Workout = require('../models/workout_model')
 
-const getPerformanceByWorkoutMovement = async (req, res) => {
-  let user_id = req.query.user_id
-  let workout_id = req.query.workout_id
-  let movement_id = req.query.movement_id
 
-  let result = await Performance.getPerformanceByWorkoutMovement(user_id, workout_id, movement_id)
-  res.json(result)
-}
 
 const getPerformanceByMovement = async (req, res) => {
   let user_id = req.query.user_id
@@ -32,7 +25,7 @@ const getPerformanceWithMovementWorkoutName = async (req, res) => {
 
 const updatePerformance = async (req, res) => {
   let performance = req.body
-  console.log(performance)
+  
   delete performance.name
   let tempWorkoutSum = 0
   let tempPerformanceSum = 0
@@ -89,45 +82,25 @@ const getPerformancesByCourseUser = async (req, res) => {
   res.json(result)
 }
 
-// const getLeaderboardByWorkout = async (req, res) => {
-//   let workout_id = req.params.workout_id
-//   let arr = await Performance.getLeaderboardByWorkout(workout_id)
-//   let obj = {}
 
-//   for (let item of arr) {
-//     let identifier = `${item.course_id} ${item.user_id}`
-//     obj[identifier]={
-//       round_ratio: item.round_ratio ? item.round_ratio : obj[identifier]?.round_ratio,
-//       minute_ratio: item.minute_ratio ? item.minute_ratio : obj[identifier]?.minute,
-//       kg_ratio: item.kg_ratio ? item.kg_ratio : obj[identifier]?.kg,
-//       rep_ratio: item.rep_ratio ? item.rep_ratio : obj[identifier]?.rep_ratio,
-//       meter_ratio: item.meter_ratio ? item.meter_ratio : obj[identifier]?.meter_ratio,
-//       cal_ration: item.cal_ration ? item.cal_ration : obj[identifier]?.cal_ration
-//     }
-//   }
 
-//   let courseUserArr = []
-//   for (let property in obj) {
-//     let course_id = property.substring(0, property.indexOf(' '))
-//     let user_id = property.substring(property.indexOf(' ') + 1)
-    
-//     let courseUser = obj[property]
-//     let rate = 1
-//     for (let ratioProperty in courseUser) {
-//       if(courseUser[ratioProperty]) rate *= parseFloat(courseUser[ratioProperty])
-//     }
+const getLeader = async (req, res) => {
+  let course_id = req.query.course_id
+  let user_id = req.query.user_id
+  let workout_id = req.query.workout_id 
+  let result = await Performance.getLeader(course_id, user_id, workout_id)
 
-//     courseUserArr.push({
-//       course_id, 
-//       user_id,
-//       rate
-//     })
-//   }
+  res.json(result)
+}
 
-//   courseUserArr.sort((a, b)=>b.rate - a.rate)
+const getUserWorkouts = async (req, res) => {
+  let user_id = req.params.user_id
+  let result = await Performance.getUserWorkouts(user_id)
+  res.json(result)
+}
 
-//   res.json(courseUserArr)
-// }
+
+
 
 
 const getLeaderboardByWorkouts = async (req, res) => {
@@ -210,19 +183,40 @@ const getLeaderboardByWorkouts = async (req, res) => {
   res.json(leaderboardArr)
 }
 
-const getLeader = async (req, res) => {
-  let course_id = req.query.course_id
-  let user_id = req.query.user_id
-  let workout_id = req.query.workout_id 
-  let result = await Performance.getLeader(course_id, user_id, workout_id)
 
+
+
+
+
+
+
+
+
+const getPerformanceByWorkoutMovement = async (req, res) => {
+  let user_id = req.query.user_id
+  let workout_id = req.query.workout_id
+  let movement_id = req.query.movement_id
+
+  let result = await Performance.getPerformanceByWorkoutMovement(user_id, workout_id, movement_id)
   res.json(result)
 }
 
-const getUserWorkouts = async (req, res) => {
-  let user_id = req.params.user_id
-  let result = await Performance.getUserWorkouts(user_id)
-  res.json(result)
+const getPerformanceByWorkout = async (req, res) => {
+  let user_id = req.query.user_id
+  let workout_id = req.query.workout_id
+  let movement_ids = req.query.movement_ids
+  if (typeof movement_ids === 'string') {
+    movement_ids = [movement_ids]
+  }
+
+  let movementArr = []
+
+  for (let movement_id of movement_ids) {
+    result = await Performance.getPerformanceByWorkoutMovement(user_id, workout_id, movement_id)
+    movementArr.push(result)
+  }
+
+  res.json(movementArr)
 }
 
 module.exports = {
@@ -237,5 +231,6 @@ module.exports = {
   getLeaderboardByWorkouts,
   getLeader,
   getUserWorkouts,
-  getPerformanceByWorkoutMovement
+  getPerformanceByWorkoutMovement,
+  getPerformanceByWorkout
 }

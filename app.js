@@ -24,8 +24,12 @@ app.use(function (err, req, res, next) {
   console.log(err);
   if(err.sql) {
     if(err.errno == 1451) {
-      if(err.sqlMessage.includes('performance')) return res.status(400).json({error: 'There is user using this item for recording performances. Please delete the related performances first'})
-      if(err.sqlMessage.includes('workout')) return res.status(400).json({error: 'There is workout using this item. Please remove the item from the related workout first'})
+      if(err.sqlMessage.includes('performance')) return res.status(400).json({error: 'There is user using this item for recording performances. Please delete the related performances first.'})
+      if(err.sqlMessage.includes('workout')) return res.status(400).json({error: 'There is workout using this item. Please remove the item from the related workout first.'})
+      return res.status(400).json({error: 'Some person or item is using this item. You cannot remove it.'})
+    }
+    if(err.errno == 1062) {
+      return res.status(400).json({error: 'Some person or item has already used this description. Please pick another one.'})
     }
     return res.status(400).json({error: err.sqlMessage})
   }
