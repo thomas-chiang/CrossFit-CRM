@@ -39,11 +39,22 @@ const getMovements = async (req, res) => {
 
     let originalLink = item.demo_link
     let embedLink = 'https://www.youtube.com/embed/'
+
+    let youtube_id
+
     if (originalLink !== null) {
-      if (originalLink.includes('https://www.youtube.com/')) embedLink += originalLink.slice(originalLink.indexOf('watch?v=')+8, originalLink.indexOf('&'))
-      if (originalLink.includes('https://youtu.be/')) embedLink += originalLink.slice(17)
+      if (originalLink.includes('https://www.youtube.com/')) {
+        youtube_id = originalLink.slice(originalLink.indexOf('watch?v=')+8, originalLink.indexOf('&'))
+        embedLink += youtube_id
+      } 
+      if (originalLink.includes('https://youtu.be/')) {
+        youtube_id = originalLink.slice(17)
+        embedLink += youtube_id
+      } 
       item.embed_link = embedLink
     }
+
+    item.youtube_id = youtube_id
     
     item.value = item.id
     item.label = item.name

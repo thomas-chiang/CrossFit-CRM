@@ -160,6 +160,32 @@ const deleteWorkoutWorkoutWithMovements = async (req, res) => {
 const getDistinctWorkoutMovements = async (req, res) => {
   let workout_id = req.params.workout_id
   let result = await Workout.getDistinctWorkoutMovements(workout_id)
+
+  for (let item of result) {
+
+    let originalLink = item.demo_link
+    let embedLink = 'https://www.youtube.com/embed/'
+
+    let youtube_id
+
+    if (originalLink !== null) {
+      if (originalLink.includes('https://www.youtube.com/')) {
+        youtube_id = originalLink.slice(originalLink.indexOf('watch?v=')+8, originalLink.indexOf('&'))
+        embedLink += youtube_id
+      } 
+      if (originalLink.includes('https://youtu.be/')) {
+        youtube_id = originalLink.slice(17)
+        embedLink += youtube_id
+      } 
+      item.embed_link = embedLink
+    }
+
+    item.youtube_id = youtube_id
+    
+    item.value = item.id
+    item.label = item.name
+  }
+  
   res.json(result)
 }
 
