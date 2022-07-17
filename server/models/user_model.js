@@ -215,6 +215,18 @@ const getPointsByUser = async (user_id) => {
   return result
 }
 
+const getSumPointsByUser = async (user_id) => {
+  const [result] = await pool.query(`
+    select 
+      user_id, 
+      Ifnull(sum(point),0) as point, 
+      Ifnull(sum(point_to_be_deducted),0) as point_to_be_deducted
+    from points
+    where user_id = ?
+    group by user_id
+  `, [ user_id ]);
+  return result[0]
+}
 
 module.exports = {
   signUp,
@@ -233,5 +245,6 @@ module.exports = {
   insertPoint,
   updateRole,
   getAvailablePointsByUser,
-  getPointsByUser
+  getPointsByUser,
+  getSumPointsByUser
 }

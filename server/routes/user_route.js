@@ -17,7 +17,7 @@ router.route('/user/point').put(authenticate('gym'), isValid(), wrapAsync(User.u
 router.route('/user/point').post(authenticate('gym'), isValid(), wrapAsync(User.insertPoint))
 router.route('/user/point/:user_id').get( wrapAsync(User.getPointsByUser))
 //router.route('/user/point/:user_id').post(authenticate('gym'), isValid(), wrapAsync(User.getPoint))
-
+router.route('/user/sumpoint/:user_id').get( wrapAsync(User.getSumPointsByUser))
 
 
 module.exports = router;

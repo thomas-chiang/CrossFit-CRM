@@ -6,6 +6,9 @@ const User = require('../models/user_model');
 const bcrypt = require('bcrypt');
 const moment = require('moment');
 
+
+
+
 const signUp = async (req, res) => {
   //check input format
   let {name, email, password, gender, role} = req.body;
@@ -211,6 +214,11 @@ const getPointsByUser = async (req, res) => {
   res.status(200).json(result)
 }
 
+const getSumPointsByUser = async (req, res) => {
+  let user_id = req.params.user_id
+  let result = await User.getSumPointsByUser(user_id)
+  res.status(200).json(result)
+}
 
 
 module.exports = {
@@ -227,5 +235,6 @@ module.exports = {
   updatePoint,
   insertPoint,
   updateRole,
-  getPointsByUser
+  getPointsByUser,
+  getSumPointsByUser
 };
