@@ -1,6 +1,26 @@
 const Course = require('../models/course_model')
 const validator = require('validator');
 
+const removeMemberById = async (req, res) => {
+  let creator_id = req.user.id
+  let user_id = req.query.user_id
+  let course_id = req.query.course_id
+  let enrollment = req.query.enrollment
+  if(!course_id || !user_id) return res.status(500).json({error:'Server Error: Please refresh page or reach out to gym'})
+  let result = await Course.removeMemberById(course_id, user_id, enrollment, creator_id)
+  res.json(result)
+}
+
+const uncheckoutMemberById = async (req, res) => {
+  let creator_id = req.user.id
+  let user_id = req.query.user_id
+  let course_id = req.query.course_id
+  let enrollment = req.query.enrollment
+  if(!course_id || !user_id) return res.status(500).json({error:'Server Error: Please refresh page or reach out to gym'})
+  let result = await Course.uncheckoutMemberById(course_id, user_id, enrollment, creator_id)
+  res.json(result)
+} 
+
 const checkoutMemberById = async (req, res) => {
   let creator_id = req.user.id
   let user_id = req.query.user_id
@@ -176,13 +196,11 @@ module.exports = {
   deleteCourse,
   enroll,
   quit,
-  // createPerformance,
-  // getPerformaces,
-  // updatePerformance,
-  // deletePerformance,
   getCourseEnrolledmembers,
   enrollMemberByEmail,
   quitMemberById,
   checkoutMemberById,
-  enrollMemberByExistingUserId
+  enrollMemberByExistingUserId,
+  uncheckoutMemberById,
+  removeMemberById
 }

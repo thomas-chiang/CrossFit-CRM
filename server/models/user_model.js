@@ -228,6 +228,11 @@ const getSumPointsByUser = async (user_id) => {
   return result[0]
 }
 
+const deletePointById = async (point_id) => {
+  const [result] = await pool.query('delete from points where id = ?',[point_id]);
+  return result
+}
+
 module.exports = {
   signUp,
   signIn,
@@ -246,5 +251,6 @@ module.exports = {
   updateRole,
   getAvailablePointsByUser,
   getPointsByUser,
-  getSumPointsByUser
+  getSumPointsByUser,
+  deletePointById
 }

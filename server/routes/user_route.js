@@ -13,6 +13,7 @@ router.route('/user/valid').put(authenticate('gym'), isValid(), wrapAsync(User.u
 router.route('/user/point').put(authenticate('gym'), isValid(), wrapAsync(User.updatePoint))
 router.route('/user/point').post(authenticate('gym'), isValid(), wrapAsync(User.insertPoint))
 router.route('/user/point/:user_id').get( wrapAsync(User.getPointsByUser))
+router.route('/user/point/:point_id').delete(authenticate('gym'), isValid(), wrapAsync(User.deletePointById))
 router.route('/user/sumpoint/:user_id').get( wrapAsync(User.getSumPointsByUser))
 
 

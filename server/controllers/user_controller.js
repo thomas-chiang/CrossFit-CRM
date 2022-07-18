@@ -220,6 +220,12 @@ const getSumPointsByUser = async (req, res) => {
   res.status(200).json(result)
 }
 
+const deletePointById = async (req, res) => {
+  let point_id = req.params.point_id
+  let result = await User.deletePointById(point_id)
+  res.status(200).json(result)
+}
+
 
 module.exports = {
   signUp,
@@ -236,5 +242,6 @@ module.exports = {
   insertPoint,
   updateRole,
   getPointsByUser,
-  getSumPointsByUser
+  getSumPointsByUser,
+  deletePointById
 };

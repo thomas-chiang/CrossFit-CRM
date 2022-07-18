@@ -1,5 +1,83 @@
 const { pool } = require('./mysql_conn');
 
+const removeMemberById = async (course_id, user_id, enrollment, creator_id) => {
+  const conn = await pool.getConnection()
+  try{
+    await conn.query('start transaction')
+
+    if (enrollment == 1){
+      let [course_result] = await conn.query(`select * from courses where id = ?`,[course_id])
+      let course_point = course_result[0].point
+      // deduct point_to_be_deducted
+      let pointObj = {
+        course_id: course_id,
+        point_to_be_deducted: - course_point,
+        user_id: user_id,
+        creator_id: creator_id,
+        time: new Date()
+      }
+      await conn.query('insert into points set ?', [pointObj])
+    }
+
+    let [result] = await conn.query(`delete from course_user where course_id = ? and user_id = ?`, [course_id, user_id])
+
+    await conn.query('commit')
+    return result
+  }catch(error){
+    await conn.query('rollback')
+    console.log(error)
+    throw error
+  }finally{
+    await conn.release()
+  }
+}
+
+const uncheckoutMemberById = async (course_id, user_id, enrollment, creator_id) => {
+  const conn = await pool.getConnection()
+  try{
+    await conn.query('start transaction')
+
+    let [result] = await conn.query(`update course_user set checkout = 0 where course_id = ? and user_id = ?`, [course_id, user_id])
+
+    let [course_result] = await conn.query(`select * from courses where id = ?`,[course_id])
+    let course_point = course_result[0].point
+
+    
+    if (enrollment == 1){
+      let pointObj = {
+        course_id: course_id,
+        point:  course_point,
+        point_to_be_deducted:  course_point,
+        user_id: user_id,
+        creator_id: creator_id,
+        time: new Date()
+      }
+      await conn.query('insert into points set ?', [pointObj])
+
+    } else {
+      let pointObj = {
+        course_id: course_id,
+        point:  course_point,
+        user_id: user_id,
+        creator_id: creator_id,
+        time: new Date()
+      }
+      await conn.query('insert into points set ?', [pointObj])
+    }
+    
+    await conn.query('commit')
+    return result
+  }catch(error){
+    await conn.query('rollback')
+    console.log(error)
+    throw error
+  }finally{
+    await conn.release()
+  }
+}
+
+
+
 const checkoutMemberById = async (course_id, user_id, enrollment, creator_id) => {
   const conn = await pool.getConnection()
   try{
@@ -65,43 +143,6 @@ const quitMemberById = async (course_id, user_id, enrollment, creator_id) => {
         time: new Date()
       }
       await conn.query('insert into points set ?', [pointObj])
-
-/* 
-      // check if there is next user
-      let [next_users_result] = await conn.query(` 
-        select 
-          course_user.user_id 
-        from course_user 
-        left join (
-          select 
-            user_id, 
-            IFNULL(sum(point),0) as point, 
-            IFNULL(sum(point_to_be_deducted),0) as point_to_be_deducted
-          from points
-          group by user_id
-        ) sum_points on sum_points.user_id = course_user.user_id
-        where course_user.enrollment > 1 
-        and course_user.course_id = ?
-        and sum_points.point - sum_points.point_to_be_deducted > ? 
-        order by course_user.enrollment asc
-      `, [course_id, course_point]) 
-
-      // next user existed
-      if(next_users_result.length > 0) {  
-        let next_user_id = next_users_result[0].user_id
-
-        let pointObj = {
-          course_id: course_id,
-          point_to_be_deducted: course_point,
-          user_id: next_user_id,
-          creator_id: creator_id,
-        }
-        
-        await conn.query('update course_user set enrollment = 1 where course_id = ? and user_id = ?', [id, next_user_id])
-        await conn.query('insert into points set ?', [pointObj])
-      }
- */
-
     }
     
     await conn.query('commit')
@@ -678,13 +719,11 @@ module.exports = {
   deleteCourse,
   enroll,
   quit,
-  // createPerformance,
-  // getPerformaces,
-  // updatePerformance,
-  // deletePerformance,
   getCourseEnrolledmembers,
   enrollMemberByEmail,
   quitMemberById,
   checkoutMemberById,
-  enrollMemberByExistingUserId
+  enrollMemberByExistingUserId,
+  uncheckoutMemberById,
+  removeMemberById
 }
