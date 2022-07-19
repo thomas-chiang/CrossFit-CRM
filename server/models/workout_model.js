@@ -51,7 +51,8 @@ const getWorkout = async (workout_id) => {   // movement issues
       workout_movement.rep, 
       workout_movement.meter,
        
-      movements.name as movement_name
+      movements.name as movement_name,
+      movements.demo_link
     from workouts 
     left join workout_movement 
     on workouts.id = workout_movement.workout_id
@@ -62,6 +63,26 @@ const getWorkout = async (workout_id) => {   // movement issues
 
   let obj = {}
   for (item of workoutWithMovements) {
+
+    let originalLink = item.demo_link
+    let embedLink = 'https://www.youtube.com/embed/'
+
+    let youtube_id
+
+    if (originalLink !== null) {
+      if (originalLink.includes('https://www.youtube.com/')) {
+        youtube_id = originalLink.slice(originalLink.indexOf('watch?v=')+8, originalLink.indexOf('&'))
+        embedLink += youtube_id
+      } 
+      if (originalLink.includes('https://youtu.be/')) {
+        youtube_id = originalLink.slice(17)
+        embedLink += youtube_id
+      } 
+      item.embed_link = embedLink
+    }
+
+    item.youtube_id = youtube_id
+
     let movementObj = {
       id: item.workout_movement_id,
       movement_id: item.movement_id,
@@ -71,7 +92,7 @@ const getWorkout = async (workout_id) => {   // movement issues
       cal: item.cal,
       rep: item.rep,
       meter: item.meter,
-      //sec: item.sec
+      youtube_id: item.youtube_id
     }
 
     if(obj[item.id]){
@@ -260,61 +281,6 @@ const getOwnedWorkouts = async (user) => {
 }
 
 
-
-// const getOwnedWorkoutsWithMovements = async (user) => {  // VS getWorkoutsWithMovements // movement issues
-//   const [workouts] = await pool.query(`
-//   select 
-//     workouts.*,
-//     workout_movement.id as workout_movement_id, 
-//     workout_movement.movement_id, 
-//     workout_movement.kg, 
-//     workout_movement.cal, 
-//     workout_movement.rep, 
-//     workout_movement.meter,
-//     workout_movement.sec, 
-//     movements.name as movement_name
-//   from workouts 
-//   left join workout_movement 
-//   on workouts.id = workout_movement.workout_id
-//   left join movements 
-//   on workout_movement.movement_id = movements.id
-//   where workouts.creator_id = ?
-//   `, [user.id])
-  
-//   let obj = {}
-//   for (const workout of workouts) {
-
-//     let movementObj = {
-//         id: workout.workout_movement_id,
-//         movement_id: workout.movement_id,
-//         workout_id: workout.id,
-//         name: workout.movement_name,
-//         kg: workout.kg,
-//         cal: workout.cal,
-//         rep: workout.rep,
-//         meter: workout.meter,
-//         sec: workout.sec
-//       } 
-
-
-//     if(obj[workout.id]){
-//       obj[workout.id].movements.push(movementObj)
-//     } else {
-//       obj[workout.id] = {
-//         id: workout.id,
-//         name: workout.name,
-//         minute: workout.minute,
-//         note: workout.note,
-//         demo_link: workout.demo_link,
-//         creator_id: workout.creator_id,
-//         movements: [movementObj]
-//       }
-//     }
-
-//     if(!obj[workout.id].movements[0].id) delete obj[workout.id].movements
-//   }
-//   return obj
-// }
 
 
 
