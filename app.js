@@ -14,7 +14,6 @@ app.use('/api/', [
   require('./server/routes/user_route'),
   require('./server/routes/movement_route'),
   require('./server/routes/workout_route'),
-  require('./server/routes/gym_route'),
   require('./server/routes/token_route'),
   require('./server/routes/performance_route'),
 ]);
