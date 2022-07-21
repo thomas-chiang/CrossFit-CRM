@@ -106,7 +106,7 @@ const getWorkout = async (workout_id) => {   // movement issues
         minute: item.minute,
         extra_sec: item.extra_sec,
         note: item.note,
-        demo_link: item.demo_link,
+        //demo_link: item.demo_link,
         creator_id: item.creator_id,
         movements: [movementObj]
       }
@@ -245,7 +245,7 @@ const getWorkoutsWithMovements = async () => { // movement issues
         minute: workout.minute,
         extra_sec: workout.extra_sec,
         note: workout.note,
-        demo_link: workout.demo_link,
+        //demo_link: workout.demo_link,
         creator_id: workout.creator_id,
         movements: movementObj ? [movementObj] : undefined
       }

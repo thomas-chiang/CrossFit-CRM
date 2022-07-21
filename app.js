@@ -1,7 +1,9 @@
 // Express Initialization
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const app = express();
+const PORT = process.env.NODE_ENV === 'test' ? 6000 : 5000
 
 app.set('trust proxy', true);
 
@@ -36,6 +38,8 @@ app.use(function (err, req, res, next) {
   res.status(500).json({error: 'Internal Server Error'});
 });
 
-app.listen(5000, () => {
-  console.log(`Listening on port: 5000`);
+app.listen(PORT, () => {
+  console.log(`Listening on port: ${PORT}`);
 });
+
+module.exports = app

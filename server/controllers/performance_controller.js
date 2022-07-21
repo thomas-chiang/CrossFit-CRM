@@ -201,6 +201,9 @@ const getPerformanceByWorkoutMovement = async (req, res) => {
   res.json(result)
 }
 
+
+
+
 const getPerformanceByWorkout = async (req, res) => {
   let user_id = req.query.user_id
   let workout_id = req.query.workout_id
@@ -218,6 +221,10 @@ const getPerformanceByWorkout = async (req, res) => {
 
   res.json(movementArr)
 }
+
+
+
+
 
 module.exports = {
   createPerformance,

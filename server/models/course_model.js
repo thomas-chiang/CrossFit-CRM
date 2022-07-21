@@ -320,8 +320,6 @@ const quit = async (id, user) => {
     
     await conn.query('update course_user set enrollment = 0 where course_id = ? and user_id = ?', [id, user.id])
     
-    console.log(course_user_enrollment)
-    
     // next user
     let next_user_id = 0
     if (course_user_enrollment == 1) { 
@@ -641,14 +639,6 @@ const getCourses = async () => {
       obj[item.id] = {
         id: item.id,
         creator_id: item.creator_id,
-        // gym_id: item.gym_id,
-        // gym_name: item.gym_name,
-        // gym: {
-        //   id: item.gym_id,
-        //   label: item.gym_name,
-        //   value: item.gym_id,
-        //   name: item.gym_name
-        // },
         title: item.title,
         size: item.size,
         start: item.start,

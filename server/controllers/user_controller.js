@@ -35,6 +35,7 @@ const signUp = async (req, res) => {
   });
 };
 
+
 const signIn = async (req, res) => { 
   //check input format
   let {email, password, role} = req.body;
@@ -53,6 +54,7 @@ const signIn = async (req, res) => {
     user
   });
 };
+
 
 const getUserProfile = async (req, res) => {
   let user = req.user
