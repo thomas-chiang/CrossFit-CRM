@@ -1,7 +1,7 @@
-const { pool } = require('./mysql_conn');
+const { pool } = require("./mysql_conn");
 
 const createMovement = async (movement) => {
-  const [result] = await pool.query('INSERT INTO movements SET ?', [movement]);
+  const [result] = await pool.query("INSERT INTO movements SET ?", [movement]);
   return result;
 };
 
@@ -11,30 +11,25 @@ const updateMovement = async (movement) => {
       UPDATE movements 
       SET ? 
       WHERE id = ?
-    `, [movement, movement.id]);
+    `,
+    [movement, movement.id]
+  );
   return result;
 };
 
 const getMovements = async () => {
-  const [result] = await pool.query('select * from movements');
-  return result
+  const [result] = await pool.query("select * from movements");
+  return result;
 };
 
 const deleteMovement = async (id) => {
-  const [result] = await pool.query('delete from movements where id = ?',[id]);
-  return result
+  const [result] = await pool.query("delete from movements where id = ?", [id]);
+  return result;
 };
-
-const getOwnedMovements = async (user) => {
-  const [result] = await pool.query('select * from movements where creator_id = ?',[user.id]);
-  return result
-};
-
 
 module.exports = {
   createMovement,
   getMovements,
   updateMovement,
-  deleteMovement,
-  getOwnedMovements
+  deleteMovement
 };

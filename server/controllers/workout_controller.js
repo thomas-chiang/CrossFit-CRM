@@ -1,204 +1,186 @@
-const Workout = require('../models/workout_model')
+const Workout = require("../models/workout_model");
+const Utils = require("../../utils/util");
 
 const getWorkoutMovements = async (req, res) => {
-  let workout_id = req.params.workout_id
-  let result = await Workout.getWorkoutMovements(workout_id)
-  res.json(result)
-}
+  let workout_id = req.params.workout_id;
+  let result = await Workout.getWorkoutMovements(workout_id);
+  res.json(result);
+};
 
-const updateOnlyWorkout = async(req, res) => {
-  let updatedWorkout = req.body
-  
-  if(!updatedWorkout.name) return res.status(400).json({error: 'Workout name cannot be emtpy'})
-  if(updatedWorkout.round < 0 || updatedWorkout.extra_count < 0 || updatedWorkout.minute < 0 || updatedWorkout.extra_sec < 0) return res.status(400).json({error:'Round, extra rep, minute, or extra sec must >= 0 or leave empty'})
-  if(updatedWorkout.extra_sec > 59) return res.status(400).json({error:'Extra sec must < 60'})
+const updateOnlyWorkout = async (req, res) => {
+  let updatedWorkout = req.body;
+  let unitArr = [updatedWorkout.round, updatedWorkout.extra_count, updatedWorkout.minute, updatedWorkout.extra_sec];
 
-  let tempWorkoutSum = 0
-  for (let property in updatedWorkout){
-    if(updatedWorkout[property] > 0 && (property == 'round' || property == 'extra_count' || property == 'minute' || property == 'extra_sec')) tempWorkoutSum += updatedWorkout[property]
-    // if(!updatedWorkout[property]) updatedWorkout[property] = null // not set null
-  }
-  if(tempWorkoutSum == 0) return res.status(400).json({error:'Aleast one of the measures (round, extra rep, minute, or extra sec) should > 0'})
+  if (!updatedWorkout.name) return res.status(400).json({ error: "Workout name cannot be emtpy" });
 
-  delete updatedWorkout.movements
-  let result = await Workout.updateOnlyWorkout(updatedWorkout)
-  res.json(result)
-}
+  if (!Utils.isStringArrPositiveIntegersOrZeros(unitArr))
+    return res.status(400).json({
+      error: "Round, extra rep, minute, or extra sec must be positive integer, 0, or leave empty"
+    });
 
+  if (Utils.isStringArrItemLargerThan1M(unitArr))
+    return res.status(400).json({
+      error: "Round, extra rep, minute, or extra sec must < 1000000"
+    });
 
-const addWorkoutMovement = async(req, res) => {
-  let newWorkoutMovement = req.body
-  let result = await Workout.addWorkoutMovement(newWorkoutMovement)
-  res.json(result)
-}
+  if (updatedWorkout.extra_sec > 59) return res.status(400).json({ error: "Extra sec must < 60" });
+
+  if (Utils.unitTotal(updatedWorkout) == 0)
+    return res.status(400).json({
+      error: "Aleast one of the measures (round, extra rep, minute, or extra sec) should > 0"
+    });
+
+  delete updatedWorkout.movements;
+  let result = await Workout.updateOnlyWorkout(updatedWorkout);
+  res.json(result);
+};
+
+const addWorkoutMovement = async (req, res) => {
+  let newWorkoutMovement = req.body;
+
+  let unitArr = [newWorkoutMovement.kg, newWorkoutMovement.rep, newWorkoutMovement.meter, newWorkoutMovement.cal];
+  if (!Utils.isStringArrPositiveIntegersOrZeros(unitArr))
+    return res.status(400).json({
+      error: "Kg, rep, meter, or cal must be positive integer, 0, or leave empty"
+    });
+
+  if (Utils.isStringArrItemLargerThan1M(unitArr)) return res.status(400).json({ error: "Kg, rep, meter, or cal must < 1000000" });
+
+  if (Utils.unitTotal(newWorkoutMovement) == 0)
+    return res.status(400).json({
+      error: "At least one of the measures (Kg, rep, meter, or cal) should > 0"
+    });
+
+  let result = await Workout.addWorkoutMovement(newWorkoutMovement);
+  res.json(result);
+};
 
 const getWorkout = async (req, res) => {
-  let workout_id = req.params.workout_id
-  let obj = await Workout.getWorkout(workout_id)
-  let arr = Object.keys(obj).map(workout_id => obj[workout_id])
-  res.json(arr[0])
-}
+  let workout_id = req.params.workout_id;
+  let obj = await Workout.getWorkout(workout_id);
+  let arr = Object.keys(obj).map((workout_id) => obj[workout_id]);
+  res.json(arr[0]);
+};
 
 const deleteWorkoutMovement = async (req, res) => {
-  let workout_movement_id = req.params.workout_movement_id
-  let result = await Workout.deleteWorkoutMovement(workout_movement_id)
-  res.json(result)
-}
+  let workout_movement_id = req.params.workout_movement_id;
+  let result = await Workout.deleteWorkoutMovement(workout_movement_id);
+  res.json(result);
+};
 
 const updateWorkoutMovement = async (req, res) => {
-  let workoutMovement = req.body
+  let workoutMovement = req.body;
+  let unitArr = [workoutMovement.kg, workoutMovement.rep, workoutMovement.meter, workoutMovement.cal];
 
-  let tempMovementSum = 0
-  for (let property in workoutMovement) {
-    if(workoutMovement[property] < 0 /* || workoutMovement[property] === '0' */) return res.status(400).json({error: 'Kg, rep, meter, or cal must >= 0'})
-    // if(!workoutMovement[property]) workoutMovement[property] = null // not set null
-    if(workoutMovement[property] > 0 && (property == 'kg' || property == 'rep' || property == 'meter' || property == 'cal')) 
-        tempMovementSum += workoutMovement[property]
-  }
-  if(tempMovementSum == 0) return res.status(400).json({error: 'At least one of the measures (Kg, rep, meter, or cal) should > 0'})
+  if (!Utils.isStringArrPositiveIntegersOrZeros(unitArr))
+    return res.status(400).json({
+      error: "Kg, rep, meter, or cal must be positive integer, 0, or leave empty"
+    });
 
-  delete workoutMovement.name
-  let result = await Workout.updateWorkoutMovement(workoutMovement)
-  res.json(result)
-}
+  if (Utils.isStringArrItemLargerThan1M(unitArr)) return res.status(400).json({ error: "Kg, rep, meter, or cal must < 1000000" });
+
+  if (Utils.unitTotal(workoutMovement) == 0)
+    return res.status(400).json({
+      error: "At least one of the measures (Kg, rep, meter, or cal) should > 0"
+    });
+
+  delete workoutMovement.name;
+  let result = await Workout.updateWorkoutMovement(workoutMovement);
+  res.json(result);
+};
 
 const getWorkoutMovement = async (req, res) => {
-  let workout_movement_id = req.params.workout_movement_id
-  let [result] = await Workout.getWorkoutMovement(workout_movement_id)
-  res.json(result)
-}
+  let workout_movement_id = req.params.workout_movement_id;
+  let [result] = await Workout.getWorkoutMovement(workout_movement_id);
+  res.json(result);
+};
 
-const createWorkoutWithMovement = async (req, res) => {
-  const workout = req.body
-  if(!workout.name) return res.status(400).json({error:'Workout name cannot be empty'})
-  if(workout.round < 0 || workout.extra_count < 0 || workout.minute < 0 || workout.extra_sec < 0) return res.status(400).json({error:'Round, extra rep, minute, or extra sec must >= 0 or leave empty'})
-  if(workout.extra_sec > 59) return res.status(400).json({error:'Extra sec must < 60'})
-  
-  let tempWorkoutSum = 0
-  for (let property in workout){
-    if(workout[property] > 0 && (property == 'round' || property == 'extra_count' || property == 'minute' || property == 'extra_sec')) tempWorkoutSum += workout[property]
-    if(!workout[property]) workout[property] = null
-  }
-  if(tempWorkoutSum == 0) return res.status(400).json({error:'Aleast one of the measures (round, extra rep, minute, or extra sec) should > 0'})
-   
-  let tempMovementSum = 0
+const createWorkoutWithMovements = async (req, res) => {
+  const workout = req.body;
+  let unitArr = [workout.round, workout.extra_count, workout.minute, workout.extra_sec];
+
+  if (!workout.name) return res.status(400).json({ error: "Workout name cannot be empty" });
+
+  if (!Utils.isStringArrPositiveIntegersOrZeros(unitArr))
+    return res.status(400).json({
+      error: "Round, extra rep, minute, or extra sec must be positive integer, 0, or leave empty"
+    });
+
+  if (Utils.isStringArrItemLargerThan1M(unitArr))
+    return res.status(400).json({ error: "Round, extra rep, minute, or extra sec must < 1000000" });
+
+  if (workout.extra_sec > 59) return res.status(400).json({ error: "Extra sec must < 60" });
+
+  if (Utils.unitTotal(workout) == 0)
+    return res.status(400).json({
+      error: "Aleast one of the WORKOUT measures (round, extra rep, minute, or extra sec) should > 0"
+    });
+
   for (let movement of workout.movementArr) {
-    for (let property in movement) {
-      if(movement[property] < 0 /* || movement[property] === '0' */) return res.status(400).json({error: 'Kg, rep, meter, or cal must > 0'})
-      // if(!movement[property]) movement[property] = null // not set null
-      if(movement[property] > 0 && (property == 'kg' || property == 'rep' || property == 'meter' || property == 'cal')) 
-        tempMovementSum += performance[property]
-    }
+    let unitArr = [movement.kg, movement.rep, movement.meter, movement.cal];
+    if (!Utils.isStringArrPositiveIntegersOrZeros(unitArr))
+      return res.status(400).json({
+        error: "For every MOVEMENT, Kg, rep, meter, or cal must be positive integer, 0, or leave empty"
+      });
+
+    if (Utils.isStringArrItemLargerThan1M(unitArr))
+      return res.status(400).json({ error: "Kg, rep, meter, or cal must < 1000000" });
+
+    if (Utils.unitTotal(movement) == 0)
+      return res.status(400).json({
+        error: "For every MOVEMENT, at least one of the measures (Kg, rep, meter, or cal) should > 0"
+      });
   }
-  if(tempMovementSum == 0) return res.status(400).json({error: 'At least one of the measures (Kg, rep, meter, or cal) should > 0'})
 
-  let user = req.user
-  workout.creator_id = user.id
-  let result = await Workout.createWorkoutWithMovement(workout)
-  res.json(result)
-
-}
-
-// const createWorkout = async (req, res) => {
-//   const workout = req.body
-//   let user = req.user
-//   workout.creator_id = user.id
-//   let result = await Workout.createWorkout(workout)
-//   res.json(result);
-// };
+  let user = req.user;
+  workout.creator_id = user.id;
+  let result = await Workout.createWorkoutWithMovements(workout);
+  res.json(result);
+};
 
 const updateWorkout = async (req, res) => {
-  const updatedWorkout = req.body
-  let user = req.user
-  updatedWorkout.creator_id = user.id
-  let result = await Workout.updateWorkout(updatedWorkout)
+  const updatedWorkout = req.body;
+  let user = req.user;
+  updatedWorkout.creator_id = user.id;
+  let result = await Workout.updateWorkout(updatedWorkout);
   res.json(result);
 };
 
 const getWorkouts = async (req, res) => {
-  let workouts = await Workout.getWorkouts()
-  for (let workout of workouts){
-    workout.value = workout.id
-    workout.label = workout.name
-  }
-  res.json(workouts)
-}
-
-const getOwnedWorkouts = async (req, res) => {
-  let user = req.user
-  let result = await Workout.getOwnedWorkouts(user)
-  res.json(result)
-}
+  let workouts = await Workout.getWorkouts();
+  Utils.addReactSelectProperties(workouts, "id", "name");
+  res.json(workouts);
+};
 
 const deleteWorkout = async (req, res) => {
-  workout_id = req.params.workout_id
-  let result = await Workout.deleteWorkout(workout_id)
-  res.json(result)
-}
+  workout_id = req.params.workout_id;
+  let result = await Workout.deleteWorkout(workout_id);
+  res.json(result);
+};
 
 const getWorkoutsWithMovements = async (req, res) => {
-  let obj = await Workout.getWorkoutsWithMovements()
-  let arr = Object.keys(obj).map(workout_id => obj[workout_id])
-  res.json(arr)
-}
-
-const getOwnedWorkoutsWithMovements = async (req, res) => {
-  let user = req.user
-  let obj = await Workout.getOwnedWorkoutsWithMovements(user)
-
-  let arr = Object.keys(obj).map(workout_id => obj[workout_id])
-  res.json(arr)
-}
-
-const deleteWorkoutWorkoutWithMovements = async (req, res) => {
-  let workout = req.body
-  if(!workout.id || !workout.movements) return res.status(400).json({error: 'incomplete workout info'})
-  let result = await Workout.deleteWorkoutWithMovements(workout)
-  res.json(result)
-}
+  let obj = await Workout.getWorkoutsWithMovements();
+  let arr = Object.keys(obj).map((workout_id) => obj[workout_id]);
+  res.json(arr);
+};
 
 const getDistinctWorkoutMovements = async (req, res) => {
-  let workout_id = req.params.workout_id
-  let result = await Workout.getDistinctWorkoutMovements(workout_id)
+  let workout_id = req.params.workout_id;
+  let results = await Workout.getDistinctWorkoutMovements(workout_id);
 
-  for (let item of result) {
+  Utils.addYoutubeIdProperty(results);
+  Utils.addYoutubeEmbedLinkProperty(results);
+  Utils.addReactSelectProperties(results, "id", "name");
 
-    let originalLink = item.demo_link
-    let embedLink = 'https://www.youtube.com/embed/'
-
-    let youtube_id
-
-    if (originalLink !== null) {
-      if (originalLink.includes('https://www.youtube.com/')) {
-        youtube_id = originalLink.slice(originalLink.indexOf('watch?v=')+8, originalLink.indexOf('&'))
-        embedLink += youtube_id
-      } 
-      if (originalLink.includes('https://youtu.be/')) {
-        youtube_id = originalLink.slice(17)
-        embedLink += youtube_id
-      } 
-      item.embed_link = embedLink
-    }
-
-    item.youtube_id = youtube_id
-    
-    item.value = item.id
-    item.label = item.name
-  }
-  
-  res.json(result)
-}
+  res.json(results);
+};
 
 module.exports = {
-  // createWorkout,
   getWorkouts,
   updateWorkout,
   deleteWorkout,
-  getOwnedWorkouts,
-  createWorkoutWithMovement,
+  createWorkoutWithMovements,
   getWorkoutsWithMovements,
-  getOwnedWorkoutsWithMovements,
-  deleteWorkoutWorkoutWithMovements,
   getWorkoutMovement,
   updateWorkoutMovement,
   deleteWorkoutMovement,
@@ -207,4 +189,4 @@ module.exports = {
   updateOnlyWorkout,
   getWorkoutMovements,
   getDistinctWorkoutMovements
-}
+};

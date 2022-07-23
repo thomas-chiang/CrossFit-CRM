@@ -1,12 +1,14 @@
-const { pool } = require('./mysql_conn');
+const { pool } = require("./mysql_conn");
 
 const getWorkout = async (workout_id) => {
-  const [result] = await pool.query('select * from workouts where id = ? ',[workout_id])
-  return result[0]
-}
+  const [result] = await pool.query("select * from workouts where id = ? ", [workout_id]);
+  return result[0];
+};
 
-const getPerformanceByWorkoutMovement = async (user_id, workout_id, movement_id)=> {
-  const [result] = await pool.query(`
+// analysis bar
+const getPerformanceByWorkoutMovement = async (user_id, workout_id, movement_id, limit) => {
+  const [result] = await pool.query(
+    `
     SELECT 
       performances.kg,
       performances.rep,
@@ -25,13 +27,17 @@ const getPerformanceByWorkoutMovement = async (user_id, workout_id, movement_id)
     and performances.workout_id = ?
     and performances.movement_id = ?
     ORDER BY courses.start ASC
-  `,[user_id, workout_id, movement_id])
+    limit ?
+  `,
+    [user_id, workout_id, movement_id, limit]
+  );
 
-  return result
-}
+  return result;
+};
 
-const getPerformanceByUserMovement = async (user_id, movement_id)=> {
-  const [result] = await pool.query(`
+const getPerformanceByUserMovement = async (user_id, movement_id) => {
+  const [result] = await pool.query(
+    `
     SELECT 
       performances.kg,
       performances.rep,
@@ -49,13 +55,16 @@ const getPerformanceByUserMovement = async (user_id, movement_id)=> {
     where performances.user_id = ?
     and performances.movement_id = ?
     ORDER BY courses.start ASC
-  `,[user_id, movement_id])
+  `,
+    [user_id, movement_id]
+  );
 
-  return result
-}
+  return result;
+};
 
 const getPerformanceWithMovementWorkoutName = async (performance_id) => {
-  const [result] = await pool.query(`
+  const [result] = await pool.query(
+    `
     select 
       performances.*,
       movements.name,
@@ -64,19 +73,21 @@ const getPerformanceWithMovementWorkoutName = async (performance_id) => {
     left join movements on performances.movement_id = movements.id
     left join workouts on performances.workout_id = workouts.id
     where performances.id = ? 
-  `, [performance_id])
+  `,
+    [performance_id]
+  );
 
-  return result
-}
-
-const createPerformacne = async (performance) => {
-  const [result] = await pool.query('INSERT INTO performances SET ?', [performance]);
   return result;
 };
 
-const getPerformancesByCourseUser = async(course_id, user_id) => {
-  
-  const [performances] = await pool.query(`
+const createPerformacne = async (performance) => {
+  const [result] = await pool.query("INSERT INTO performances SET ?", [performance]);
+  return result;
+};
+
+const getPerformancesByCourseUser = async (course_id, user_id) => {
+  const [performances] = await pool.query(
+    `
     select 
       performances.*,
       movements.name,
@@ -86,33 +97,31 @@ const getPerformancesByCourseUser = async(course_id, user_id) => {
     left join workouts on performances.workout_id = workouts.id
     where performances.course_id = ? 
     and performances.user_id = ?
-  `, [course_id, user_id])
+  `,
+    [course_id, user_id]
+  );
 
-  return performances
-}
+  return performances;
+};
 
 const updatePerformance = async (performance) => {
-  const [result] = await pool.query(
-    `
-      UPDATE performances 
-      SET ? 
-      WHERE id = ?
-    `, [performance, performance.id]);
+  const [result] = await pool.query(` UPDATE performances SET ? WHERE id = ? `, [performance, performance.id]);
   return result;
 };
 
 const getPerformacnes = async () => {
-  const [result] = await pool.query('select * from performacnes');
-  return result
+  const [result] = await pool.query("select * from performacnes");
+  return result;
 };
 
 const deletePerformance = async (performance) => {
-  const [result] = await pool.query('delete from performances where id = ?',[performance.id]);
-  return result
+  const [result] = await pool.query("delete from performances where id = ?", [performance.id]);
+  return result;
 };
 
-const getLeaderboardByWorkout = async (workout_id, movementsLength) => {
-  const [result] = await pool.query(`
+const getLeadersByWorkout = async (workout_id, movementsLength) => {
+  const [result] = await pool.query(
+    `
   SELECT
       performances.id,
       performances.course_id,
@@ -140,12 +149,15 @@ const getLeaderboardByWorkout = async (workout_id, movementsLength) => {
     left join users on performances.user_id = users.id
     where performances.workout_id = ?
     limit ?
-  `,[workout_id, movementsLength*10]);
-  return result
-}
+  `,
+    [workout_id, movementsLength * 10]
+  );
+  return result;
+};
 
 const getLeader = async (course_id, user_id, workout_id) => {
-  const [result] = await pool.query(`
+  const [result] = await pool.query(
+    `
     select 
       performances.*,
       users.name as user_name,
@@ -161,23 +173,42 @@ const getLeader = async (course_id, user_id, workout_id) => {
     where performances.user_id = ?
     and performances.course_id = ?
     and performances.workout_id = ?
-  `,[user_id, course_id, workout_id]);
+  `,
+    [user_id, course_id, workout_id]
+  );
 
-  return result
-}
+  return result;
+};
 
 const getUserWorkouts = async (user_id) => {
-  const [result] = await pool.query(`
+  const [result] = await pool.query(
+    `
     select 
       distinct performances.workout_id, 
       workouts.name 
     from performances 
     left join workouts on performances.workout_id = workouts.id
     where user_id = ?
-  `,[user_id]);
+  `,
+    [user_id]
+  );
 
-  return result
-}
+  return result;
+};
+
+const numberOfSameMovementInWorkout = async (workout_id, movement_id) => {
+  const [result] = await pool.query(
+    `
+    select count(id) as count
+    from workout_movement 
+    where workout_id = ?
+    and movement_id = ?
+  `,
+    [workout_id, movement_id]
+  );
+
+  return result[0].count;
+};
 
 module.exports = {
   createPerformacne,
@@ -187,9 +218,10 @@ module.exports = {
   getPerformancesByCourseUser,
   getPerformanceWithMovementWorkoutName,
   getPerformanceByUserMovement,
-  getLeaderboardByWorkout,
+  getLeadersByWorkout,
   getWorkout,
   getLeader,
   getUserWorkouts,
-  getPerformanceByWorkoutMovement
+  getPerformanceByWorkoutMovement,
+  numberOfSameMovementInWorkout
 };
