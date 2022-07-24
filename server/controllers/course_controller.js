@@ -42,7 +42,8 @@ const quitMemberById = async (req, res) => {
 
 const enrollMemberByExistingUserId = async (req, res) => {
   let creator_id = req.user.id;
-  const { user_id, course_id } = req.query;
+  const user_id = req.params.user_id
+  const { course_id } = req.query;
   if (!course_id) return res.status(500).json({ error: "Server Error: Please refresh page or reach out to IT" });
   let result = await Course.enrollMemberByExistingUserId(course_id, user_id, creator_id);
   res.json(result);
@@ -81,7 +82,10 @@ const quit = async (req, res) => {
         <p>Thanks for your waiting.</p>
         <p>You have been successfully enrolled into ${course.title} at ${moment(course.start).format("YYYY/MM/DD H:mm:ss A")}.</p>
 
-        <p>Please go to ${DOMAIN_NAME} for more information.</p>
+        <p>This is a system response, so please do not reply this email.</p>
+        <p>If you want to quit the course or unsubscribe from the email list, please go to ${DOMAIN_NAME} for more customized settings.</p>
+        
+        <p>Best</p>
         <p>Crossfit Team</p>
       `
     };
@@ -174,7 +178,7 @@ const getCourses = async (req, res) => {
 };
 
 const deleteCourse = async (req, res) => {
-  let id = req.params.id;
+  let id = req.query.course_id;
   let result = await Course.deleteCourse(id);
   res.json(result);
 };
