@@ -149,6 +149,11 @@ const deletePointById = async (point_id) => {
   return result;
 };
 
+const getUserOnly = async (user_id) => {
+  const [result] = await pool.query("select * from users where id = ?", [user_id]);
+  return result[0];
+};
+
 module.exports = {
   signUp,
   signIn,
@@ -163,5 +168,6 @@ module.exports = {
   getAvailablePointsByUser,
   getPointsByUser,
   getSumPointsByUser,
-  deletePointById
+  deletePointById,
+  getUserOnly
 };

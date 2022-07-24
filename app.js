@@ -22,7 +22,6 @@ app.use("/api/", [
 
 // Error handling
 app.use(function (err, req, res, next) {
-  console.log(err);
   if (err.sql) {
     if (err.errno == 1451) {
       if (err.sqlMessage.includes("performance"))
@@ -44,7 +43,7 @@ app.use(function (err, req, res, next) {
     }
     return res.status(400).json({ error: err.sqlMessage });
   }
-  if (err.status === 400) return res.status(400).json({ error: err.message });
+  //if (err.status === 400) return res.status(400).json({ error: err.message });
   if (err.status) return res.status(err.status).json({ error: err.message });
   res.status(500).json({ error: "Internal Server Error" });
 });

@@ -1,7 +1,10 @@
 const Course = require("../models/course_model");
+const User = require("../models/user_model");
 const validator = require("validator");
 const Utils = require("../../utils/util");
 const moment = require("moment");
+const mailUtil = require("../../utils/mail_util");
+const { EMAIL_SENDER, DOMAIN_NAME } = process.env;
 
 const removeMemberById = async (req, res) => {
   let creator_id = req.user.id;
@@ -64,8 +67,32 @@ const getCourseEnrolledmembers = async (req, res) => {
 const quit = async (req, res) => {
   let course_id = req.params.id;
   let user_id = req.user.id;
-  let result = await Course.quit(course_id, user_id);
-  res.json(result);
+  let next_user_id = await Course.quit(course_id, user_id);
+  if (next_user_id) {
+    let course = await Course.getCourseOnly(course_id);
+    let next_user = await User.getUserOnly(next_user_id);
+    const mailOptions = {
+      from: EMAIL_SENDER,
+      to: next_user.email,
+      subject: `Notification: Waiting to Enrolled`,
+      html: `
+        <p>Hi ${next_user.name},</p>    
+        
+        <p>Thanks for your waiting.</p>
+        <p>You have been successfully enrolled into ${course.title} at ${moment(course.start).format("YYYY/MM/DD H:mm:ss A")}.</p>
+
+        <p>Please go to ${DOMAIN_NAME} for more information.</p>
+        <p>Crossfit Team</p>
+      `
+    };
+    try {
+      await mailUtil.sendMail(mailOptions);
+    } catch (err) {
+      console.log(err);
+      return res.json(err);
+    }
+  }
+  res.json(next_user_id);
 };
 
 const enroll = async (req, res) => {

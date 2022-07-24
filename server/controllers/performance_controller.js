@@ -1,6 +1,7 @@
 const Performance = require("../models/performance_model");
 const Workout = require("../models/workout_model");
 const Utils = require("../../utils/util");
+const { LEADERBOARD_LIMIT, ANALYSIS_LIMIT } = process.env;
 
 const getPerformanceByMovement = async (req, res) => {
   const { user_id, movement_id } = req.query;
@@ -110,7 +111,7 @@ const getSortedLeadersByWorkouts = async (req, res) => {
     let objWithWorkoutIdAsKey = await Workout.getWorkout(workout_id);
     let workoutWithMovements = objWithWorkoutIdAsKey[workout_id];
     let numberOfMovements = workoutWithMovements.movements.length;
-    let performances = await Performance.getLeadersByWorkout(workout_id, numberOfMovements);
+    let performances = await Performance.getLeadersByWorkout(workout_id, numberOfMovements, parseInt(LEADERBOARD_LIMIT));
     let objWithCourseIdUserIdAsKey = Utils.convertToCalculatedObjWithIdsAsKey(performances);
     let LeadersArr = Utils.convertToArrWithLeaderScore(workout_id, objWithCourseIdUserIdAsKey);
     LeadersArr.sort((a, b) => b.score - a.score);
@@ -135,7 +136,14 @@ const getPerformanceByWorkout = async (req, res) => {
   let movementArr = [];
   for (let movement_id of movement_ids) {
     let numberOfMovements = await Performance.numberOfSameMovementInWorkout(workout_id, movement_id);
-    movementArr.push(await Performance.getPerformanceByWorkoutMovement(user_id, workout_id, movement_id, numberOfMovements * 5));
+    movementArr.push(
+      await Performance.getPerformanceByWorkoutMovement(
+        user_id,
+        workout_id,
+        movement_id,
+        numberOfMovements * parseInt(ANALYSIS_LIMIT)
+      )
+    );
   }
   res.json(movementArr);
 };

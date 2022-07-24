@@ -119,7 +119,7 @@ const deletePerformance = async (performance) => {
   return result;
 };
 
-const getLeadersByWorkout = async (workout_id, movementsLength) => {
+const getLeadersByWorkout = async (workout_id, movementsLength, limit) => {
   const [result] = await pool.query(
     `
   SELECT
@@ -150,7 +150,7 @@ const getLeadersByWorkout = async (workout_id, movementsLength) => {
     where performances.workout_id = ?
     limit ?
   `,
-    [workout_id, movementsLength * 10]
+    [workout_id, movementsLength * limit]
   );
   return result;
 };

@@ -285,7 +285,6 @@ const quit = async (course_id, user_id) => {
 
     // change enrollment status
     await conn.query("update course_user set enrollment = 0 where course_id = ? and user_id = ?", [course_id, user_id]);
-
     let next_user_id; // next user
     if (course_user_enrollment == 1) {
       let pointObj = {
@@ -525,6 +524,11 @@ const deleteCourse = async (id) => {
   }
 };
 
+const getCourseOnly = async (course_id) => {
+  let [result] = await pool.query("select * from courses where id = ?", [course_id]);
+  return result[0];
+};
+
 module.exports = {
   createCourse,
   getCourses,
@@ -538,5 +542,6 @@ module.exports = {
   checkoutMemberById,
   enrollMemberByExistingUserId,
   uncheckoutMemberById,
-  removeMemberById
+  removeMemberById,
+  getCourseOnly
 };
