@@ -3,6 +3,7 @@
 
 A well-rounded gym system including __membership administration__, __workout customization__, __performance analysis__, and __course management__.
 ![](./readme_media/intro.gif)
+![](./readme_media/intro_canva.gif)
 
 ## Table of content
 * [Demo](#Demo)
@@ -11,11 +12,11 @@ A well-rounded gym system including __membership administration__, __workout cus
 
 
 
-## Demo
+## Link
 
  https://crossfit-crm.online/
 
-> Demo account:
+> Test account:
 >
 > - Role: Gym Owner
 > - Email: demo@email.com 
@@ -24,8 +25,28 @@ A well-rounded gym system including __membership administration__, __workout cus
 
 
 ## Features
+- Membership administration:
+  - Validate users
+  - Update points
+  - Update roles
+   
+- Workout customization:
+  - Manange movements
+  - Manange workouts
 
+- Performance analysis:
+  - Manange performances
+  - Analyze performances
+  - Compete in Leaderboards
 
+- Course management:
+  - Manange Courses
+  - Enroll Courses
+  - Checkout Courses
+ 
+## Architecture
+
+## Database Schema
 
 ## Technologies
 
