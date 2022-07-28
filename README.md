@@ -2,7 +2,7 @@
 # CrossFit CRM
 
 A well-rounded gym system including __membership administration__, __workout customization__, __performance analysis__, and __course management__.
-![](./readme_media/intro_AdobeExpress.gif)
+![](./readme_media/intro.gif)
 
 ## Table of content
 * [Demo](#Demo)
