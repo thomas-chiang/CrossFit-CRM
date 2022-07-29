@@ -7,6 +7,8 @@ A well-rounded gym system including **membership administration**, **workout cus
 
 - [Link](#Link)
 - [Features](#Features)
+- [Architecture](#Architecture)
+- [Database Schema](#Database-Schema)
 - [Technologies](#Technologies)
 
 ## Link
