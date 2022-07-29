@@ -6,10 +6,11 @@ A well-rounded gym system including **membership administration**, **workout cus
 ## Table of content
 
 - [Link](#Link)
-- [Features](#Features)
+- [Technologies](#Technologies)
 - [Architecture](#Architecture)
 - [Database Schema](#Database-Schema)
-- [Technologies](#Technologies)
+- [Features](#Features)
+
 
 ## Link
 
@@ -20,6 +21,23 @@ https://crossfit-crm.online/
 > - Role: Gym Owner
 > - Email: test@email.com
 > - Password: test
+
+## Technologies
+
+- Server: Node, Express
+- Client: React, MUI
+- Database: MySQL
+- Cloud Service(AWS): EC2, SES
+- Test: Mocha, Chai
+
+## Architecture
+
+![](./readme_media/structure.png)
+
+## Database Schema
+
+![](./readme_media/schema.png)
+
 
 ## Features
 
@@ -50,18 +68,5 @@ https://crossfit-crm.online/
 
 ![](./readme_media/performance.gif)
 
-## Architecture
 
-![](./readme_media/structure.png)
 
-## Database Schema
-
-![](./readme_media/schema.png)
-
-## Technologies
-
-- Server: Node, Express
-- Client: React, MUI
-- Database: MySQL
-- Cloud Service(AWS): EC2, SES
-- Test: Mocha, Chai
