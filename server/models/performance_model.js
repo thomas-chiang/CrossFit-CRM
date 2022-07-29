@@ -119,10 +119,10 @@ const deletePerformance = async (performance) => {
   return result;
 };
 
-const getLeadersByWorkout = async (workout_id, movementsLength, limit) => {
+const getLeadersByWorkout = async (workout_id /* , movementsLength, limit */) => {
   const [result] = await pool.query(
     `
-  SELECT
+    SELECT
       performances.id,
       performances.course_id,
       performances.user_id,
@@ -136,7 +136,13 @@ const getLeadersByWorkout = async (workout_id, movementsLength, limit) => {
       IFNULL(performances.kg / workout_movement.kg, 1) 
       * IFNULL(performances.rep / workout_movement.rep, 1) 
       * IFNULL(performances.meter / workout_movement.meter, 1) 
-      * IFNULL(performances.cal / workout_movement.cal, 1) as ratio
+      * IFNULL(performances.cal / workout_movement.cal, 1) as ratio,
+      IFNULL((performances.round + performances.extra_count / workout_total_count.total_count) / workouts.round, 1) 
+      * IFNULL(workouts.minute / (performances.minute + performances.extra_sec / 60), 1)
+      * IFNULL(performances.kg / workout_movement.kg, 1) 
+      * IFNULL(performances.rep / workout_movement.rep, 1) 
+      * IFNULL(performances.meter / workout_movement.meter, 1) 
+      * IFNULL(performances.cal / workout_movement.cal, 1) as sum_m
     FROM performances
     left join workout_movement on performances.workout_movement_id = workout_movement.id
     left join workouts on performances.workout_id = workouts.id
@@ -148,9 +154,10 @@ const getLeadersByWorkout = async (workout_id, movementsLength, limit) => {
     ) workout_total_count on performances.workout_id = workout_total_count.workout_id
     left join users on performances.user_id = users.id
     where performances.workout_id = ?
-    limit ?
+    order by sum_m desc
+    
   `,
-    [workout_id, movementsLength * limit]
+    [workout_id /* , movementsLength * limit */]
   );
   return result;
 };

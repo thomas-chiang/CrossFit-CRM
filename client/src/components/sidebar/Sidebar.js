@@ -4,7 +4,7 @@ import { ProSidebar, Menu, MenuItem, SidebarContent } from "react-pro-sidebar";
 export default function Aside({ setSection, role }) {
   return (
     <ProSidebar>
-      <SidebarContent>
+      <SidebarContent style={{ paddingLeft: 30 }}>
         <Menu iconShape="circle">
           <div>&nbsp;</div>
           <div>&nbsp;</div>

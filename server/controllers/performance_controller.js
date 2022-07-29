@@ -110,12 +110,13 @@ const getSortedLeadersByWorkouts = async (req, res) => {
   for (let workout_id of workout_ids) {
     let objWithWorkoutIdAsKey = await Workout.getWorkout(workout_id);
     let workoutWithMovements = objWithWorkoutIdAsKey[workout_id];
-    let numberOfMovements = workoutWithMovements.movements.length;
-    let performances = await Performance.getLeadersByWorkout(workout_id, numberOfMovements, parseInt(LEADERBOARD_LIMIT));
+    // let numberOfMovements = workoutWithMovements.movements.length;
+    let performances = await Performance.getLeadersByWorkout(workout_id /* , numberOfMovements, parseInt(LEADERBOARD_LIMIT) */);
     let objWithCourseIdUserIdAsKey = Utils.convertToCalculatedObjWithIdsAsKey(performances);
     let LeadersArr = Utils.convertToArrWithLeaderScore(workout_id, objWithCourseIdUserIdAsKey);
     LeadersArr.sort((a, b) => b.score - a.score);
-    workoutWithMovements.leaders = LeadersArr;
+
+    workoutWithMovements.leaders = LeadersArr.slice(0, LEADERBOARD_LIMIT);
     workoutsWithLeaders.push(workoutWithMovements);
   }
 

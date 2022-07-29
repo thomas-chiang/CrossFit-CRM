@@ -29,13 +29,13 @@ function Component() {
     >
       <Box>
         <Link style={linkStyle} to="/">
-          <Typography variant="h3" sx={{ fontWeight: "bold", textDecoration: "none", mx: 2 }}>
+          <Typography variant="h3" sx={{ fontWeight: "bold", textDecoration: "none", mx: 6 }}>
             CrossFit CRM
           </Typography>
         </Link>
       </Box>
 
-      <List sx={{ display: "flex", mx: 2 }}>
+      <List sx={{ display: "flex", mx: 6 }}>
         <ListItem>
           <Link style={linkStyle} to="/movement">
             MOVEMENTS

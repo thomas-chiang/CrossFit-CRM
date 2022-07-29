@@ -42,7 +42,7 @@ const quitMemberById = async (req, res) => {
 
 const enrollMemberByExistingUserId = async (req, res) => {
   let creator_id = req.user.id;
-  const user_id = req.params.user_id
+  const user_id = req.params.user_id;
   const { course_id } = req.query;
   if (!course_id) return res.status(500).json({ error: "Server Error: Please refresh page or reach out to IT" });
   let result = await Course.enrollMemberByExistingUserId(course_id, user_id, creator_id);

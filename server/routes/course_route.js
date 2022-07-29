@@ -11,7 +11,9 @@ router.route("/course/enrollment/:id").delete(authenticate("member"), isValid(),
 router.route("/course/enrolled/:course_id").get(wrapAsync(Course.getCourseEnrolledmembers));
 router.route("/course/enrollmentbycoach/").post(authenticate("coach"), isValid(), wrapAsync(Course.enrollMemberByEmail));
 router.route("/course/enrollmentbycoach/").delete(authenticate("coach"), isValid(), wrapAsync(Course.quitMemberById));
-router.route("/course/enrollmentbycoach/:user_id").post(authenticate("coach"), isValid(), wrapAsync(Course.enrollMemberByExistingUserId));
+router
+  .route("/course/enrollmentbycoach/:user_id")
+  .post(authenticate("coach"), isValid(), wrapAsync(Course.enrollMemberByExistingUserId));
 router.route("/course/checkout/").put(authenticate("gym"), isValid(), wrapAsync(Course.checkoutMemberById));
 router.route("/course/uncheck/").put(authenticate("gym"), isValid(), wrapAsync(Course.uncheckoutMemberById));
 router.route("/course/removeenrollment/").delete(authenticate("gym"), isValid(), wrapAsync(Course.removeMemberById));
