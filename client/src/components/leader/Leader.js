@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Functions from "./leader_functions";
-import { Paper, Typography, Card, Button, Divider, Box, TextField, TextareaAutosize, Dialog } from "@mui/material";
+import { Paper, Typography, Button, Divider, Box, Dialog } from "@mui/material";
 import moment from "moment";
 
 function Component({ leader, workoutWithMovements, workout }) {

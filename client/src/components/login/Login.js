@@ -2,7 +2,7 @@ import { useState, useContext, useEffect } from "react";
 import Functions from "./login_functions";
 import { AppContext } from "../../utils/reactContexts";
 import { useNavigate } from "react-router-dom";
-import { Paper, Typography, Card, Button, Box, Radio, TextField, Alert } from "@mui/material";
+import { Paper, Typography, Button, Box, Radio, TextField } from "@mui/material";
 
 function Component() {
   const appContext = useContext(AppContext);
@@ -13,10 +13,8 @@ function Component() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [disable, setDisable] = useState(false);
-
   const navigate = useNavigate();
-
-  const [alert, setAlert] = useState(null);
+  const setAlert = useContext(AppContext).setAlert;
   useEffect(() => {
     const timeId = setTimeout(() => setAlert(null), 2000);
     return () => clearTimeout(timeId);
@@ -24,28 +22,6 @@ function Component() {
 
   return (
     <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", mt: 10 }}>
-      {alert ? (
-        <Alert
-          severity="info"
-          variant="filled"
-          sx={{
-            position: "fixed",
-            top: 10,
-            right: 0,
-            left: 0,
-            mx: "auto",
-            width: alert.length * 10,
-            display: "flex",
-            justifyContent: "center",
-            backgroundColor: "gray"
-          }}
-        >
-          {alert}
-        </Alert>
-      ) : (
-        <></>
-      )}
-
       <Paper elevation={5} sx={{ height: "auto", width: "auto", p: 5 }}>
         <form style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
           {signUp ? (

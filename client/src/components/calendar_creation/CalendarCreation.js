@@ -6,7 +6,6 @@ import interactionPlugin from "@fullcalendar/interaction";
 import { useState, useEffect, useContext } from "react";
 import { CalendarContext, AppContext } from "../../utils/reactContexts";
 import CourseCreation from "../course_creation/CourseCreation";
-import Course from "../course/Course";
 import Functions from "./calendar_creation_functions";
 import { Box, Paper } from "@mui/material";
 

@@ -4,7 +4,7 @@ import Functions from "./workout_functions";
 import Select from "react-select";
 import { AppContext } from "../../utils/reactContexts";
 import UpdateWorkout from "../update_workout/UpdateWorkout";
-import { Paper, Button, Box, TextField, TextareaAutosize, Alert, Typography, CardMedia } from "@mui/material";
+import { Paper, Button, Box, TextField, TextareaAutosize, CardMedia } from "@mui/material";
 
 function Component() {
   const appContext = useContext(AppContext);

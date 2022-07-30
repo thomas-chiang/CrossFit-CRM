@@ -11,7 +11,6 @@ A well-rounded gym system including **membership administration**, **workout cus
 - [Database Schema](#Database-Schema)
 - [Features](#Features)
 
-
 ## Link
 
 https://crossfit-crm.online/
@@ -37,7 +36,6 @@ https://crossfit-crm.online/
 ## Database Schema
 
 ![](./readme_media/schema.png)
-
 
 ## Features
 
@@ -67,6 +65,3 @@ https://crossfit-crm.online/
   - Compete in Leaderboards
 
 ![](./readme_media/performance.gif)
-
-
-

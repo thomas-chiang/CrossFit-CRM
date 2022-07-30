@@ -1,4 +1,3 @@
-import utilsFunctions from "../../utils/functions";
 const Functions = {
   getRole
 };

@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Navigate } from "react-router-dom"; // auth handler
 import Functions from "./member_functions";
-import { Paper, Typography, Button, Box, TextField, Alert } from "@mui/material";
+import { Paper, Typography, Button, Box, TextField } from "@mui/material";
 import Select from "react-select";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { AppContext } from "../../utils/reactContexts";
@@ -41,7 +41,8 @@ function MemberBox({ member, setUpdate, setAuth }) {
   const [deductingPoint, setDeductingPointPoint] = useState(0);
   const [selectedRole, setSelectedRole] = useState(member);
   const [disable, setDisable] = useState(false);
-  const [alert, setAlert] = useState(null);
+  const setAlert = useContext(AppContext).setAlert;
+  // const [alert, setAlert] = useState(null);
   useEffect(() => {
     const timeId = setTimeout(() => setAlert(null), 2000);
     return () => clearTimeout(timeId);
@@ -49,27 +50,6 @@ function MemberBox({ member, setUpdate, setAuth }) {
 
   return (
     <Paper elevation={5} sx={{ p: 1, m: 1 }}>
-      {alert ? (
-        <Alert
-          severity="info"
-          variant="filled"
-          sx={{
-            position: "fixed",
-            top: 10,
-            right: 0,
-            left: 0,
-            mx: "auto",
-            width: alert.length * 10,
-            display: "flex",
-            justifyContent: "center",
-            backgroundColor: "gray"
-          }}
-        >
-          {alert}
-        </Alert>
-      ) : (
-        <></>
-      )}
       <Box sx={{ mb: 2, display: "flex", justifyContent: "space-between" }}>
         {member.name}:
         <Paper elevation={3} sx={{ textAlign: "center", p: 1 }}>
