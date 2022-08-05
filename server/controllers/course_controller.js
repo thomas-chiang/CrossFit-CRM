@@ -9,7 +9,6 @@ const { EMAIL_SENDER, DOMAIN_NAME } = process.env;
 const removeMemberById = async (req, res) => {
   let creator_id = req.user.id;
   const { user_id, course_id, enrollment } = req.query;
-  if (!course_id || !user_id) return res.status(500).json({ error: "Server Error: Please refresh page or reach out to gym" });
   let result = await Course.removeMemberById(course_id, user_id, enrollment, creator_id);
   res.json(result);
 };
@@ -17,7 +16,6 @@ const removeMemberById = async (req, res) => {
 const uncheckoutMemberById = async (req, res) => {
   let creator_id = req.user.id;
   const { user_id, course_id, enrollment } = req.query;
-  if (!course_id || !user_id) return res.status(500).json({ error: "Server Error: Please refresh page or reach out to gym" });
   let result = await Course.uncheckoutMemberById(course_id, user_id, enrollment, creator_id);
   res.json(result);
 };
@@ -26,7 +24,6 @@ const checkoutMemberById = async (req, res) => {
   let creator_id = req.user.id;
   const { user_id, course_id, enrollment } = req.query;
   if (enrollment != 1) return res.status(400).json({ error: "Must first enroll the user into the course before checking out" });
-  if (!course_id || !user_id) return res.status(500).json({ error: "Server Error: Please refresh page or reach out to gym" });
   let result = await Course.checkoutMemberById(course_id, user_id, enrollment, creator_id);
   res.json(result);
 };
@@ -35,7 +32,6 @@ const quitMemberById = async (req, res) => {
   let creator_id = req.user.id;
   const { user_id, course_id, enrollment } = req.query;
   if (enrollment != 1) return res.status(400).json({ error: "Must first enroll the user into the course before quiting" });
-  if (!course_id || !user_id) return res.status(500).json({ error: "Server Error: Please refresh page or reach out to gym" });
   let result = await Course.quitMemberById(course_id, user_id, enrollment, creator_id);
   res.json(result);
 };
@@ -44,7 +40,6 @@ const enrollMemberByExistingUserId = async (req, res) => {
   let creator_id = req.user.id;
   const user_id = req.params.user_id;
   const { course_id } = req.query;
-  if (!course_id) return res.status(500).json({ error: "Server Error: Please refresh page or reach out to IT" });
   let result = await Course.enrollMemberByExistingUserId(course_id, user_id, creator_id);
   res.json(result);
 };
@@ -53,7 +48,6 @@ const enrollMemberByEmail = async (req, res) => {
   let creator_id = req.user.id;
   const { email, course_id } = req.query;
   if (!email) return res.status(400).json({ error: "Email is required." });
-  if (!course_id) return res.status(500).json({ error: "Server Error: Please refresh page or reach out to IT" });
   if (!validator.isEmail(email)) return res.status(400).json({ error: "Invalid email format" });
   let result = await Course.enrollMemberByEmail(course_id, email, creator_id);
   res.json(result);
