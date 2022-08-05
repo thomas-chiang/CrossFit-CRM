@@ -77,8 +77,8 @@ function Component() {
             navLinks={true}
             plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
             headerToolbar={{
-              left: "prev next today",
-              center: "customButton",
+              left: "prev next customButton",
+              center: "title",
               right: "timeGridDay timeGridWeek dayGridMonth"
             }}
             customButtons={{

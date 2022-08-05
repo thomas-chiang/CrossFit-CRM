@@ -6,12 +6,12 @@ import { Paper, Typography, Button, Box, Radio, TextField } from "@mui/material"
 
 function Component() {
   const appContext = useContext(AppContext);
-  const [role, setRole] = useState(null);
+  const [role, setRole] = useState(3);
   const [signUp, setSignUp] = useState(false);
   const [gender, setGender] = useState(null);
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("test@email.com");
+  const [password, setPassword] = useState("test");
   const [disable, setDisable] = useState(false);
   const navigate = useNavigate();
   const setAlert = useContext(AppContext).setAlert;
