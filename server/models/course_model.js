@@ -1,6 +1,7 @@
 const { pool } = require("./mysql_conn");
 const ModelUtils = require("../../utils/model_util");
-const Utils = require("../../utils/util");
+const RestructureUtils = require("../../utils/data_restructure_util")
+
 
 const removeMemberById = async (course_id, user_id, enrollment, creator_id) => {
   const conn = await pool.getConnection();
@@ -499,7 +500,7 @@ const getCourses = async () => {
     left join workouts on course_workout.workout_id = workouts.id
   `);
 
-  return Utils.convertToObjWithCourseIdAsKey(courses);
+  return RestructureUtils.convertToObjWithCourseIdAsKey(courses);
 };
 
 const deleteCourse = async (id) => {

@@ -2,6 +2,7 @@ const Course = require("../models/course_model");
 const User = require("../models/user_model");
 const validator = require("validator");
 const Utils = require("../../utils/util");
+const ObjPropertyUtils = require("../../utils/obj_property_util");
 const moment = require("moment");
 const mailUtil = require("../../utils/mail_util");
 const { EMAIL_SENDER, DOMAIN_NAME } = process.env;
@@ -159,11 +160,11 @@ const getCourses = async (req, res) => {
     const course = obj[course_id];
 
     const participantsObj = course.participants;
-    if (participantsObj) Utils.updateCoursePropertyByParticipantsObj(course, participantsObj);
+    if (participantsObj) ObjPropertyUtils.updateCoursePropertyByParticipantsObj(course, participantsObj);
     else course.size_enrolled = 0;
 
     const workoutObj = course.workouts;
-    if (workoutObj) Utils.updateCoursePropertyByWorkoutObj(course, workoutObj);
+    if (workoutObj) ObjPropertyUtils.updateCoursePropertyByWorkoutObj(course, workoutObj);
 
     return obj[course_id];
   });

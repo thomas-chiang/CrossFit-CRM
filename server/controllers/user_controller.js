@@ -5,7 +5,9 @@ const validator = require("validator");
 const User = require("../models/user_model");
 const bcrypt = require("bcrypt");
 const moment = require("moment");
-const Utils = require("../../utils/util");
+const RestructureUtils = require("../../utils/data_restructure_util")
+const ObjPropertyUtils = require("../../utils/obj_property_util");
+
 
 const signUp = async (req, res) => {
   //check input format
@@ -70,19 +72,19 @@ const getUserProfile = async (req, res) => {
 const getUsersByRole = async (req, res) => {
   const role = req.params.role;
   const users = await User.getUsersByRole(role);
-  Utils.addReactSelectPropertiesForRole(users);
+  ObjPropertyUtils.addReactSelectPropertiesForRole(users);
   res.status(200).json(users);
 };
 
 const getValidCoaches = async (req, res) => {
   const coaches = await User.getValidCoaches();
-  Utils.addReactSelectProperties(coaches, "id", "name");
+  ObjPropertyUtils.addReactSelectProperties(coaches, "id", "name");
   res.status(200).json(coaches);
 };
 
 const getCoaches = async (req, res) => {
   const coaches = await User.getCoaches();
-  Utils.addReactSelectProperties(coaches, "id", "name");
+  ObjPropertyUtils.addReactSelectProperties(coaches, "id", "name");
   res.status(200).json(coaches);
 };
 
@@ -128,7 +130,7 @@ const getPointsByUser = async (req, res) => {
   for (let item of results) {
     item.time = moment(item.time).local().format("YYYY/MM/DD H:mm:ss A");
     if (item.course_time) item.course_time = moment(item.course_time).local().format("YYYY/MM/DD H:mm:ss A");
-    Utils.convertRoleKeyFromNumberToString(item);
+    RestructureUtils.convertRoleKeyFromNumberToString(item);
   }
 
   res.status(200).json(results);

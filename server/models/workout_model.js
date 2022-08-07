@@ -1,5 +1,5 @@
 const { pool } = require("./mysql_conn");
-const Utils = require("../../utils/util");
+const RestructureUtils = require("../../utils/data_restructure_util")
 
 const selectWorkoutsWithMovementsSQL = `
   select 
@@ -75,7 +75,7 @@ const getWorkout = async (workout_id) => {
   `,
     [workout_id]
   );
-  return Utils.convertToObjWithWorkoutIdAsKey(workoutWithMovements);
+  return RestructureUtils.convertToObjWithWorkoutIdAsKey(workoutWithMovements);
 };
 
 const deleteWorkoutMovement = async (workout_movement_id) => {
@@ -172,7 +172,7 @@ const getWorkouts = async () => {
 const getWorkoutsWithMovements = async () => {
   const [workouts] = await pool.query(selectWorkoutsWithMovementsSQL);
 
-  return Utils.convertToObjWithWorkoutIdAsKey(workouts);
+  return RestructureUtils.convertToObjWithWorkoutIdAsKey(workouts);
 };
 
 const deleteWorkout = async (workout_id) => {

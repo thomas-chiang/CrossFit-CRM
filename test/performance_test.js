@@ -3,7 +3,8 @@ const { expect, requester } = require("./set_up");
 const { users, performance } = require("./fake_data");
 const moment = require("moment");
 const { pool } = require("../server/models/mysql_conn");
-const { getPerformanceByWorkoutMovement } = require("../server/models/performance_model");
+const { getPerformanceByWorkoutMovement, numberOfSameMovementInWorkout } = require("../server/models/performance_model");
+const { ANALYSIS_LIMIT } = process.env;
 
 const member1 = users[1];
 const user = {
@@ -37,9 +38,10 @@ describe("performance", () => {
     movement1Id = movementData[0].id;
   });
 
-  it("[unit] get performances by specific user, workout, movement", async () => {
+  it("get performances by specific user, workout, movement", async () => {
     const workout1Id = workout1Data.id;
-    const result = await getPerformanceByWorkoutMovement(userId, workout1Id, movement1Id);
+    const numberOfMovements = await numberOfSameMovementInWorkout(workout1Id, movement1Id);
+    const result = await getPerformanceByWorkoutMovement(userId, workout1Id, movement1Id, numberOfMovements * parseInt(ANALYSIS_LIMIT));
     const performance1 = result[0];
     performance1.start = moment(performance1.start).format("YYYY-MM-DD HH:mm");
 

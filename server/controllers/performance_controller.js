@@ -1,6 +1,7 @@
 const Performance = require("../models/performance_model");
 const Workout = require("../models/workout_model");
 const Utils = require("../../utils/util");
+const RestructureUtils = require("../../utils/data_restructure_util")
 const { LEADERBOARD_LIMIT, ANALYSIS_LIMIT } = process.env;
 
 const getPerformanceByMovement = async (req, res) => {
@@ -111,8 +112,8 @@ const getSortedLeadersByWorkouts = async (req, res) => {
     const objWithWorkoutIdAsKey = await Workout.getWorkout(workout_id);
     const workoutWithMovements = objWithWorkoutIdAsKey[workout_id];
     const performances = await Performance.getLeadersByWorkout(workout_id);
-    const objWithCourseIdUserIdAsKey = Utils.convertToCalculatedObjWithIdsAsKey(performances);
-    const LeadersArr = Utils.convertToArrWithLeaderScore(workout_id, objWithCourseIdUserIdAsKey);
+    const objWithCourseIdUserIdAsKey = RestructureUtils.convertToCalculatedObjWithIdsAsKey(performances);
+    const LeadersArr = RestructureUtils.convertToArrWithLeaderScore(workout_id, objWithCourseIdUserIdAsKey);
     LeadersArr.sort((a, b) => b.score - a.score);
 
     workoutWithMovements.leaders = LeadersArr.slice(0, LEADERBOARD_LIMIT);

@@ -1,5 +1,5 @@
 const Movement = require("../models/movement_model");
-const Utils = require("../../utils/util");
+const ObjPropertyUtils = require("../../utils/obj_property_util");
 
 const createMovement = async (req, res) => {
   const movement = req.body;
@@ -41,9 +41,9 @@ const updateMovement = async (req, res) => {
 const getMovements = async (req, res) => {
   const results = await Movement.getMovements();
 
-  Utils.addYoutubeIdProperty(results);
-  Utils.addYoutubeEmbedLinkProperty(results);
-  Utils.addReactSelectProperties(results, "id", "name");
+  ObjPropertyUtils.addYoutubeIdProperty(results);
+  ObjPropertyUtils.addYoutubeEmbedLinkProperty(results);
+  ObjPropertyUtils.addReactSelectProperties(results, "id", "name");
 
   res.json(results);
 };

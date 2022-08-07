@@ -1,5 +1,7 @@
 const Workout = require("../models/workout_model");
 const Utils = require("../../utils/util");
+const ObjPropertyUtils = require("../../utils/obj_property_util");
+
 
 const getWorkoutMovements = async (req, res) => {
   const workout_id = req.params.workout_id;
@@ -148,7 +150,7 @@ const updateWorkout = async (req, res) => {
 
 const getWorkouts = async (req, res) => {
   const workouts = await Workout.getWorkouts();
-  Utils.addReactSelectProperties(workouts, "id", "name");
+  ObjPropertyUtils.addReactSelectProperties(workouts, "id", "name");
   res.json(workouts);
 };
 
@@ -168,9 +170,9 @@ const getDistinctWorkoutMovements = async (req, res) => {
   const workout_id = req.params.workout_id;
   const results = await Workout.getDistinctWorkoutMovements(workout_id);
 
-  Utils.addYoutubeIdProperty(results);
-  Utils.addYoutubeEmbedLinkProperty(results);
-  Utils.addReactSelectProperties(results, "id", "name");
+  ObjPropertyUtils.addYoutubeIdProperty(results);
+  ObjPropertyUtils.addYoutubeEmbedLinkProperty(results);
+  ObjPropertyUtils.addReactSelectProperties(results, "id", "name");
 
   res.json(results);
 };
