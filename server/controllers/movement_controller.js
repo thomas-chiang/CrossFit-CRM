@@ -9,13 +9,13 @@ const createMovement = async (req, res) => {
 
   const link = movement.demo_link;
   if (link && link.slice(0, 24) !== "https://www.youtube.com/" && link.slice(0, 17) !== "https://youtu.be/")
-    res.status(400).json({
+    return res.status(400).json({
       error: "you must provide youtube link, ex:'https://www.youtube.com/...' or 'https://youtu.be/...'"
     });
 
-  let user = req.user;
+  const user = req.user;
   movement.creator_id = user.id;
-  let result = await Movement.createMovement(movement);
+  const result = await Movement.createMovement(movement);
   res.json(result);
 };
 
@@ -25,21 +25,21 @@ const updateMovement = async (req, res) => {
   if (movement.name.length > 20)
     return res.status(400).json({ error: "Movement name including spaces cannot be more than 20 characters" });
 
-  let link = movement.demo_link;
+  const link = movement.demo_link;
   if (link && link.slice(0, 24) !== "https://www.youtube.com/" && link.slice(0, 17) !== "https://youtu.be/")
-    res.status(400).json({
+    return res.status(400).json({
       error:
         "if you are providing link, you must provide youtube link, ex:'https://www.youtube.com/...' or 'https://youtu.be/...'"
     });
 
-  let user = req.user;
+  const user = req.user;
   movement.creator_id = user.id;
-  let result = await Movement.updateMovement(movement);
+  const result = await Movement.updateMovement(movement);
   res.json(result);
 };
 
 const getMovements = async (req, res) => {
-  let results = await Movement.getMovements();
+  const results = await Movement.getMovements();
 
   Utils.addYoutubeIdProperty(results);
   Utils.addYoutubeEmbedLinkProperty(results);
@@ -50,7 +50,7 @@ const getMovements = async (req, res) => {
 
 const deleteMovement = async (req, res) => {
   id = req.params.id;
-  let result = await Movement.deleteMovement(id);
+  const result = await Movement.deleteMovement(id);
   res.json(result);
 };
 

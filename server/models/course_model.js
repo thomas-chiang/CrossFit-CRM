@@ -12,9 +12,9 @@ const removeMemberById = async (course_id, user_id, enrollment, creator_id) => {
 
     // add back point_to_be_deducted if enrolled
     if (enrollment == 1) {
-      let course_point = await ModelUtils.getCoursePoint(conn, course_id);
+      const course_point = await ModelUtils.getCoursePoint(conn, course_id);
 
-      let pointObj = {
+      const pointObj = {
         course_id: course_id,
         point_to_be_deducted: -course_point,
         user_id: user_id,
@@ -25,7 +25,7 @@ const removeMemberById = async (course_id, user_id, enrollment, creator_id) => {
       await conn.query("insert into points set ?", [pointObj]);
     }
 
-    let [result] = await conn.query(`update course_user set enrollment = null where course_id = ? and user_id = ?`, [
+    const [result] = await conn.query(`update course_user set enrollment = null where course_id = ? and user_id = ?`, [
       course_id,
       user_id
     ]);
@@ -49,14 +49,14 @@ const uncheckoutMemberById = async (course_id, user_id, enrollment, creator_id) 
     // start lock
     await conn.query("select id from courses where id = ? for update", [course_id]);
 
-    let [result] = await conn.query(`update course_user set checkout = 0 where course_id = ? and user_id = ?`, [
+    const [result] = await conn.query(`update course_user set checkout = 0 where course_id = ? and user_id = ?`, [
       course_id,
       user_id
     ]);
 
-    let course_point = await ModelUtils.getCoursePoint(conn, course_id);
+    const course_point = await ModelUtils.getCoursePoint(conn, course_id);
 
-    let pointObj = {
+    const pointObj = {
       course_id: course_id,
       point: course_point,
       point_to_be_deducted: course_point,
@@ -85,14 +85,14 @@ const checkoutMemberById = async (course_id, user_id, enrollment, creator_id) =>
     // start lock
     await conn.query("select id from courses where id = ? for update", [course_id]);
 
-    let [result] = await conn.query(`update course_user set checkout = 1 where course_id = ? and user_id = ?`, [
+    const [result] = await conn.query(`update course_user set checkout = 1 where course_id = ? and user_id = ?`, [
       course_id,
       user_id
     ]);
 
-    let course_point = await ModelUtils.getCoursePoint(conn, course_id);
+    const course_point = await ModelUtils.getCoursePoint(conn, course_id);
 
-    let pointObj = {
+    const pointObj = {
       course_id: course_id,
       point: -course_point,
       point_to_be_deducted: -course_point,
@@ -121,15 +121,15 @@ const quitMemberById = async (course_id, user_id, enrollment, creator_id) => {
     // start lock
     await conn.query("select id from courses where id = ? for update", [course_id]);
 
-    let [result] = await conn.query(`update course_user set enrollment = 0 where course_id = ? and user_id = ?`, [
+    const [result] = await conn.query(`update course_user set enrollment = 0 where course_id = ? and user_id = ?`, [
       course_id,
       user_id
     ]);
 
-    let course_point = await ModelUtils.getCoursePoint(conn, course_id);
+    const course_point = await ModelUtils.getCoursePoint(conn, course_id);
 
     // decrease point_to_be_deducted
-    let pointObj = {
+    const pointObj = {
       course_id: course_id,
       point_to_be_deducted: -course_point,
       user_id: user_id,
@@ -158,12 +158,12 @@ const enrollMemberByExistingUserId = async (course_id, user_id, creator_id) => {
     await conn.query("select id from courses where id = ? for update", [course_id]);
 
     // check point status
-    let points_available = await ModelUtils.getAvailablePointsByUser(conn, user_id);
-    let course_point = await ModelUtils.getCoursePoint(conn, course_id);
+    const points_available = await ModelUtils.getAvailablePointsByUser(conn, user_id);
+    const course_point = await ModelUtils.getCoursePoint(conn, course_id);
     if (course_point > points_available) throw { message: "do not have enough points", status: 400 };
 
     // points enough
-    let pointObj = {
+    const pointObj = {
       course_id: course_id,
       point_to_be_deducted: course_point,
       user_id: user_id,
@@ -173,7 +173,7 @@ const enrollMemberByExistingUserId = async (course_id, user_id, creator_id) => {
     await conn.query("insert into points set ?", [pointObj]);
 
     // update enrollment to 1
-    let [result] = await conn.query(` update course_user set enrollment = 1 where course_id = ? and user_id = ? `, [
+    const [result] = await conn.query(` update course_user set enrollment = 1 where course_id = ? and user_id = ? `, [
       course_id,
       user_id
     ]);
@@ -195,9 +195,9 @@ const enrollMemberByEmail = async (course_id, email, creator_id) => {
     await conn.query("start transaction");
 
     // check user status
-    let [user_result] = await conn.query(`select * from users where email = ?`, [email]);
+    const [user_result] = await conn.query(`select * from users where email = ?`, [email]);
     if (user_result.length === 0) throw { message: "no such email", status: 400 };
-    let user_id = user_result[0].id;
+    const user_id = user_result[0].id;
 
     // start lock
     await conn.query("select id from courses where id = ? for update", [course_id]);
@@ -207,12 +207,12 @@ const enrollMemberByEmail = async (course_id, email, creator_id) => {
       throw { message: "Member is already on enrollment list.", status: 400 };
 
     // check point status
-    let points_available = await ModelUtils.getAvailablePointsByUser(conn, user_id);
-    let course_point = await ModelUtils.getCoursePoint(conn, course_id);
+    const points_available = await ModelUtils.getAvailablePointsByUser(conn, user_id);
+    const course_point = await ModelUtils.getCoursePoint(conn, course_id);
     if (course_point > points_available) throw { message: "The user does not have enough points", status: 400 };
 
     // record point_to_be_deducted
-    let pointObj = {
+    const pointObj = {
       course_id: course_id,
       point_to_be_deducted: course_point,
       user_id: user_id,
@@ -275,19 +275,19 @@ const quit = async (course_id, user_id) => {
     await conn.query("select id from courses where id = ? for update", [course_id]);
 
     // check enrollment status
-    let course_user_enrollment = await ModelUtils.userEnrollmentStatusOnCourse(conn, course_id, user_id);
+    const course_user_enrollment = await ModelUtils.userEnrollmentStatusOnCourse(conn, course_id, user_id);
 
     //check if already canceled or not enrolled
     if (!course_user_enrollment) throw { message: "cannot quit without enrollment", status: 400 };
 
     // get course points
-    let course_point = await ModelUtils.getCoursePoint(conn, course_id);
+    const course_point = await ModelUtils.getCoursePoint(conn, course_id);
 
     // change enrollment status
     await conn.query("update course_user set enrollment = 0 where course_id = ? and user_id = ?", [course_id, user_id]);
     let next_user_id; // next user
     if (course_user_enrollment == 1) {
-      let pointObj = {
+      const pointObj = {
         // add back points_to_be_deducted
         course_id: course_id,
         point_to_be_deducted: -course_point,
@@ -299,7 +299,7 @@ const quit = async (course_id, user_id) => {
 
       next_user_id = await ModelUtils.getNextUserId(conn, course_id, course_point);
       if (next_user_id) {
-        let pointObj = {
+        const pointObj = {
           course_id: course_id,
           point_to_be_deducted: course_point,
           user_id: next_user_id,
@@ -331,21 +331,21 @@ const enroll = async (course_id, user_id) => {
     await conn.query("select id from courses where id = ? for update", [course_id]);
 
     // check enrollment status
-    let course_user_enrollment = await ModelUtils.userEnrollmentStatusOnCourse(conn, course_id, user_id);
+    const course_user_enrollment = await ModelUtils.userEnrollmentStatusOnCourse(conn, course_id, user_id);
     if (course_user_enrollment > 0) throw { message: "already enrolled", status: 400 };
 
     //check if points are enough
-    let course_point = await ModelUtils.getCoursePoint(conn, course_id);
-    let available_point = await ModelUtils.getAvailablePointsByUser(conn, user_id);
+    const course_point = await ModelUtils.getCoursePoint(conn, course_id);
+    const available_point = await ModelUtils.getAvailablePointsByUser(conn, user_id);
     if (course_point > available_point) throw { message: "do not have enough points", status: 400 };
 
     // available spots
-    let availableSpots = await ModelUtils.getAvailableSpots(conn, course_id);
+    const availableSpots = await ModelUtils.getAvailableSpots(conn, course_id);
 
     let result;
     if (availableSpots > 0) {
       // having avaliable spots
-      let pointObj = {
+      const pointObj = {
         course_id: course_id,
         point_to_be_deducted: course_point,
         user_id: user_id,
@@ -399,7 +399,7 @@ const createCourse = async (course, coaches, workouts) => {
     await conn.query("start transaction");
     const [result] = await conn.query("INSERT INTO courses SET ?", [course]);
 
-    let course_id = result.insertId;
+    const course_id = result.insertId;
 
     if (coaches.length > 0) {
       coaches = coaches.map((coach) => [course_id, coach.id, 1]);
@@ -427,16 +427,16 @@ const updateCourse = async (course, coaches, workouts) => {
   try {
     await conn.query("start transaction");
 
-    let course_id = course.id;
+    const course_id = course.id;
     // start lock
     await conn.query("select id from courses where id = ? for update", [course_id]);
 
     // check if can update point or size
-    let [original_enrolled] = await conn.query(`select * from course_user where course_id = ? and enrollment = 1`, [course_id]);
-    let [original_waiting] = await conn.query(`select * from course_user where course_id = ? and enrollment > 1`, [course_id]);
-    let [course_result] = await conn.query(`select * from courses where id = ?`, [course_id]);
-    let original_point = course_result[0].point;
-    let original_size = course_result[0].size;
+    const [original_enrolled] = await conn.query(`select * from course_user where course_id = ? and enrollment = 1`, [course_id]);
+    const [original_waiting] = await conn.query(`select * from course_user where course_id = ? and enrollment > 1`, [course_id]);
+    const [course_result] = await conn.query(`select * from courses where id = ?`, [course_id]);
+    const original_point = course_result[0].point;
+    const original_size = course_result[0].size;
     if (original_enrolled.length > 0 && course.point != original_point)
       throw { message: "You cannot update point when users have enrolled this course", status: 400 };
     if (original_waiting.length > 0 && course.size > original_size)
@@ -445,12 +445,12 @@ const updateCourse = async (course, coaches, workouts) => {
       throw { message: "You cannot decrease size when there are users enrolled for this course", status: 400 };
 
     // update course
-    let [result] = await conn.query(`UPDATE courses SET ? WHERE id = ? `, [course, course_id]);
+    const [result] = await conn.query(`UPDATE courses SET ? WHERE id = ? `, [course, course_id]);
 
     // set is_coach = 0 for all course user
     await conn.query(`update course_user set is_coach = 0 where course_id = ?`, [course_id]);
-    let [original_course_users] = await conn.query(`select * from course_user where course_id = ? `, [course_id]);
-    let original_course_user_ids = original_course_users.map((user) => user.user_id);
+    const [original_course_users] = await conn.query(`select * from course_user where course_id = ? `, [course_id]);
+    const original_course_user_ids = original_course_users.map((user) => user.user_id);
     for (let coach of coaches) {
       // cannot use forEach
       if (original_course_user_ids.includes(coach.id))
@@ -477,7 +477,7 @@ const updateCourse = async (course, coaches, workouts) => {
 };
 
 const getCourses = async () => {
-  let [courses] = await pool.query(`
+  const [courses] = await pool.query(`
     select 
       courses.*, 
       users.role, 
@@ -510,7 +510,7 @@ const deleteCourse = async (id) => {
     await conn.query(`delete from course_user where course_id = ?`, [id]);
     await conn.query(`delete from course_workout where course_id = ?`, [id]);
     await conn.query(`delete from performances where course_id = ?`, [id]);
-    let result = await conn.query(`delete from courses where id = ?`, [id]);
+    const result = await conn.query(`delete from courses where id = ?`, [id]);
 
     await conn.query("commit");
     return result;
@@ -524,7 +524,7 @@ const deleteCourse = async (id) => {
 };
 
 const getCourseOnly = async (course_id) => {
-  let [result] = await pool.query("select * from courses where id = ?", [course_id]);
+  const [result] = await pool.query("select * from courses where id = ?", [course_id]);
   return result[0];
 };
 

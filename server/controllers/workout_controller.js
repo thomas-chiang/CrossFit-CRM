@@ -2,14 +2,14 @@ const Workout = require("../models/workout_model");
 const Utils = require("../../utils/util");
 
 const getWorkoutMovements = async (req, res) => {
-  let workout_id = req.params.workout_id;
-  let result = await Workout.getWorkoutMovements(workout_id);
+  const workout_id = req.params.workout_id;
+  const result = await Workout.getWorkoutMovements(workout_id);
   res.json(result);
 };
 
 const updateOnlyWorkout = async (req, res) => {
-  let updatedWorkout = req.body;
-  let unitArr = [updatedWorkout.round, updatedWorkout.extra_count, updatedWorkout.minute, updatedWorkout.extra_sec];
+  const updatedWorkout = req.body;
+  const unitArr = [updatedWorkout.round, updatedWorkout.extra_count, updatedWorkout.minute, updatedWorkout.extra_sec];
 
   if (!updatedWorkout.name) return res.status(400).json({ error: "Workout name cannot be emtpy" });
 
@@ -31,14 +31,14 @@ const updateOnlyWorkout = async (req, res) => {
     });
 
   delete updatedWorkout.movements;
-  let result = await Workout.updateOnlyWorkout(updatedWorkout);
+  const result = await Workout.updateOnlyWorkout(updatedWorkout);
   res.json(result);
 };
 
 const addWorkoutMovement = async (req, res) => {
-  let newWorkoutMovement = req.body;
+  const newWorkoutMovement = req.body;
 
-  let unitArr = [newWorkoutMovement.kg, newWorkoutMovement.rep, newWorkoutMovement.meter, newWorkoutMovement.cal];
+  const unitArr = [newWorkoutMovement.kg, newWorkoutMovement.rep, newWorkoutMovement.meter, newWorkoutMovement.cal];
   if (!Utils.isStringArrPositiveIntegersOrZeros(unitArr))
     return res.status(400).json({
       error: "Kg, rep, meter, or cal must be positive integer, 0, or leave empty"
@@ -51,26 +51,26 @@ const addWorkoutMovement = async (req, res) => {
       error: "At least one of the measures (Kg, rep, meter, or cal) should > 0"
     });
 
-  let result = await Workout.addWorkoutMovement(newWorkoutMovement);
+  const result = await Workout.addWorkoutMovement(newWorkoutMovement);
   res.json(result);
 };
 
 const getWorkout = async (req, res) => {
-  let workout_id = req.params.workout_id;
-  let obj = await Workout.getWorkout(workout_id);
-  let arr = Object.keys(obj).map((workout_id) => obj[workout_id]);
+  const workout_id = req.params.workout_id;
+  const obj = await Workout.getWorkout(workout_id);
+  const arr = Object.keys(obj).map((workout_id) => obj[workout_id]);
   res.json(arr[0]);
 };
 
 const deleteWorkoutMovement = async (req, res) => {
-  let workout_movement_id = req.params.workout_movement_id;
-  let result = await Workout.deleteWorkoutMovement(workout_movement_id);
+  const workout_movement_id = req.params.workout_movement_id;
+  const result = await Workout.deleteWorkoutMovement(workout_movement_id);
   res.json(result);
 };
 
 const updateWorkoutMovement = async (req, res) => {
-  let workoutMovement = req.body;
-  let unitArr = [workoutMovement.kg, workoutMovement.rep, workoutMovement.meter, workoutMovement.cal];
+  const workoutMovement = req.body;
+  const unitArr = [workoutMovement.kg, workoutMovement.rep, workoutMovement.meter, workoutMovement.cal];
 
   if (!Utils.isStringArrPositiveIntegersOrZeros(unitArr))
     return res.status(400).json({
@@ -85,19 +85,19 @@ const updateWorkoutMovement = async (req, res) => {
     });
 
   delete workoutMovement.name;
-  let result = await Workout.updateWorkoutMovement(workoutMovement);
+  const result = await Workout.updateWorkoutMovement(workoutMovement);
   res.json(result);
 };
 
 const getWorkoutMovement = async (req, res) => {
-  let workout_movement_id = req.params.workout_movement_id;
-  let [result] = await Workout.getWorkoutMovement(workout_movement_id);
+  const workout_movement_id = req.params.workout_movement_id;
+  const [result] = await Workout.getWorkoutMovement(workout_movement_id);
   res.json(result);
 };
 
 const createWorkoutWithMovements = async (req, res) => {
   const workout = req.body;
-  let unitArr = [workout.round, workout.extra_count, workout.minute, workout.extra_sec];
+  const unitArr = [workout.round, workout.extra_count, workout.minute, workout.extra_sec];
 
   if (!workout.name) return res.status(400).json({ error: "Workout name cannot be empty" });
 
@@ -117,7 +117,7 @@ const createWorkoutWithMovements = async (req, res) => {
     });
 
   for (let movement of workout.movementArr) {
-    let unitArr = [movement.kg, movement.rep, movement.meter, movement.cal];
+    const unitArr = [movement.kg, movement.rep, movement.meter, movement.cal];
     if (!Utils.isStringArrPositiveIntegersOrZeros(unitArr))
       return res.status(400).json({
         error: "For every MOVEMENT, Kg, rep, meter, or cal must be positive integer, 0, or leave empty"
@@ -132,41 +132,41 @@ const createWorkoutWithMovements = async (req, res) => {
       });
   }
 
-  let user = req.user;
+  const user = req.user;
   workout.creator_id = user.id;
-  let result = await Workout.createWorkoutWithMovements(workout);
+  const result = await Workout.createWorkoutWithMovements(workout);
   res.json(result);
 };
 
 const updateWorkout = async (req, res) => {
   const updatedWorkout = req.body;
-  let user = req.user;
+  const user = req.user;
   updatedWorkout.creator_id = user.id;
-  let result = await Workout.updateWorkout(updatedWorkout);
+  const result = await Workout.updateWorkout(updatedWorkout);
   res.json(result);
 };
 
 const getWorkouts = async (req, res) => {
-  let workouts = await Workout.getWorkouts();
+  const workouts = await Workout.getWorkouts();
   Utils.addReactSelectProperties(workouts, "id", "name");
   res.json(workouts);
 };
 
 const deleteWorkout = async (req, res) => {
   workout_id = req.params.workout_id;
-  let result = await Workout.deleteWorkout(workout_id);
+  const result = await Workout.deleteWorkout(workout_id);
   res.json(result);
 };
 
 const getWorkoutsWithMovements = async (req, res) => {
-  let obj = await Workout.getWorkoutsWithMovements();
-  let arr = Object.keys(obj).map((workout_id) => obj[workout_id]);
+  const obj = await Workout.getWorkoutsWithMovements();
+  const arr = Object.keys(obj).map((workout_id) => obj[workout_id]);
   res.json(arr);
 };
 
 const getDistinctWorkoutMovements = async (req, res) => {
-  let workout_id = req.params.workout_id;
-  let results = await Workout.getDistinctWorkoutMovements(workout_id);
+  const workout_id = req.params.workout_id;
+  const results = await Workout.getDistinctWorkoutMovements(workout_id);
 
   Utils.addYoutubeIdProperty(results);
   Utils.addYoutubeEmbedLinkProperty(results);

@@ -63,7 +63,7 @@ const updateOnlyWorkout = async (updatedWorkout) => {
 };
 
 const addWorkoutMovement = async (newWorkoutMovement) => {
-  let [result] = await pool.query(`insert into workout_movement SET ? `, [newWorkoutMovement]);
+  const [result] = await pool.query(`insert into workout_movement SET ? `, [newWorkoutMovement]);
   return result;
 };
 
@@ -79,7 +79,7 @@ const getWorkout = async (workout_id) => {
 };
 
 const deleteWorkoutMovement = async (workout_movement_id) => {
-  let [result] = await pool.query(
+  const [result] = await pool.query(
     `
     delete from workout_movement where id = ?
   `,
@@ -102,7 +102,7 @@ const updateWorkoutMovement = async (workoutMovement) => {
 };
 
 const getWorkoutMovement = async (workout_movement_id) => {
-  let [result] = await pool.query(
+  const [result] = await pool.query(
     `
     select 
       workout_movement.*,
@@ -122,14 +122,14 @@ const createWorkoutWithMovements = async (workout) => {
   try {
     await conn.query("START TRANSACTION");
 
-    let movementArr = workout.movementArr;
+    const movementArr = workout.movementArr;
 
     // INSERT new workout and GET new workout_id
     delete workout.movementArr;
     const [result] = await conn.query("INSERT INTO workouts SET ?", workout);
-    let workout_id = result.insertId;
+    const workout_id = result.insertId;
 
-    let movementsBeToInserted = movementArr.map((movement) => [
+    const movementsBeToInserted = movementArr.map((movement) => [
       workout_id,
       movement.movement_id,
       movement.kg,

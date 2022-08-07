@@ -9,7 +9,7 @@ const Utils = require("../../utils/util");
 
 const signUp = async (req, res) => {
   //check input format
-  let { name, email, password, gender, role } = req.body;
+  const { name, email, password, gender, role } = req.body;
   if (!name || !email || !password || !gender || !role)
     return res.status(400).json({ error: "Name, email, gender, role, and password are required." });
   if (name.length > 20 || password.length > 20)
@@ -39,15 +39,15 @@ const signUp = async (req, res) => {
 
 const signIn = async (req, res) => {
   //check input format
-  let { email, password, role } = req.body;
+  const { email, password, role } = req.body;
   if (!email || !password || !role) return res.status(400).json({ error: "Role, email, and password are required." });
   if (!validator.isEmail(email)) return res.status(400).json({ error: "Invalid email format" });
 
   //query db & validate
-  let result = await User.signIn(role, email);
+  const result = await User.signIn(role, email);
   if (!result.user || !bcrypt.compareSync(password, result.user.password))
     return res.status(400).json({ error: "Invalid email or password" });
-  let user = result.user;
+  const user = result.user;
 
   //handle output
   delete user.password;
@@ -61,40 +61,40 @@ const signIn = async (req, res) => {
 
 const getUserProfile = async (req, res) => {
   let user = req.user;
-  let result = await User.getUserProfile(user.role, user.email);
+  const result = await User.getUserProfile(user.role, user.email);
   user = result;
   delete user.password;
   res.status(200).json(user);
 };
 
 const getUsersByRole = async (req, res) => {
-  let role = req.params.role;
-  let users = await User.getUsersByRole(role);
+  const role = req.params.role;
+  const users = await User.getUsersByRole(role);
   Utils.addReactSelectPropertiesForRole(users);
   res.status(200).json(users);
 };
 
 const getValidCoaches = async (req, res) => {
-  let coaches = await User.getValidCoaches();
+  const coaches = await User.getValidCoaches();
   Utils.addReactSelectProperties(coaches, "id", "name");
   res.status(200).json(coaches);
 };
 
 const getCoaches = async (req, res) => {
-  let coaches = await User.getCoaches();
+  const coaches = await User.getCoaches();
   Utils.addReactSelectProperties(coaches, "id", "name");
   res.status(200).json(coaches);
 };
 
 const updateValidStatus = async (req, res) => {
   const { user_id, valid_status } = req.query;
-  let result = await User.updateValidStatus(user_id, valid_status);
+  const result = await User.updateValidStatus(user_id, valid_status);
   res.status(200).json(result);
 };
 
 const updateRole = async (req, res) => {
   const { user_id, role } = req.query;
-  let result = await User.updateRole(user_id, role);
+  const result = await User.updateRole(user_id, role);
   res.status(200).json(result);
 };
 
@@ -114,16 +114,16 @@ const insertPoint = async (req, res) => {
       return res.status(400).json({ error: "Cannot deduct more than available points" });
   }
 
-  let time = new Date();
-  let result = await User.insertPoint(user_id, point, creator_id, time);
+  const time = new Date();
+  const result = await User.insertPoint(user_id, point, creator_id, time);
 
   res.status(200).json(result);
 };
 
 const getPointsByUser = async (req, res) => {
-  let user_id = req.params.user_id;
+  const user_id = req.params.user_id;
 
-  let results = await User.getPointsByUser(user_id);
+  const results = await User.getPointsByUser(user_id);
 
   for (let item of results) {
     item.time = moment(item.time).local().format("YYYY/MM/DD H:mm:ss A");
@@ -135,14 +135,14 @@ const getPointsByUser = async (req, res) => {
 };
 
 const getSumPointsByUser = async (req, res) => {
-  let user_id = req.params.user_id;
-  let result = await User.getSumPointsByUser(user_id);
+  const user_id = req.params.user_id;
+  const result = await User.getSumPointsByUser(user_id);
   res.status(200).json(result);
 };
 
 const deletePointById = async (req, res) => {
-  let point_id = req.params.point_id;
-  let result = await User.deletePointById(point_id);
+  const point_id = req.params.point_id;
+  const result = await User.deletePointById(point_id);
   res.status(200).json(result);
 };
 

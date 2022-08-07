@@ -157,9 +157,9 @@ const unitTotalForMovement = (workoutObj) => {
 const convertToObjWithWorkoutIdAsKey = (arr) => {
   addYoutubeIdProperty(arr);
 
-  let obj = {};
+  const obj = {};
   for (item of arr) {
-    let movementObj = {
+    const movementObj = {
       id: item.workout_movement_id,
       movement_id: item.movement_id,
       workout_id: item.workout_id,
@@ -245,24 +245,24 @@ const isCourseInputValid = (course) => {
 };
 
 const updateCoursePropertyByWorkoutObj = (course, workoutObj) => {
-  let workouts = Object.keys(workoutObj).map((workout_id) => workoutObj[workout_id]);
+  const workouts = Object.keys(workoutObj).map((workout_id) => workoutObj[workout_id]);
   addReactSelectProperties(workouts, "id", "name");
   course.workouts = workouts;
 };
 
 const updateCoursePropertyByParticipantsObj = (course, participantsObj) => {
-  let participants = Object.keys(participantsObj).map((user_id) => participantsObj[user_id]);
+  const participants = Object.keys(participantsObj).map((user_id) => participantsObj[user_id]);
   addReactSelectProperties(participants, "id", "name");
-  let coaches = participants.filter((participant) => participant.role >= COACH && participant.is_coach == IS_COACH);
-  let members = participants.filter((participant) => participant.role >= MEMBER && participant.enrollment !== null);
-  let enrolledMembers = members.filter((member) => member.enrollment >= 1);
+  const coaches = participants.filter((participant) => participant.role >= COACH && participant.is_coach == IS_COACH);
+  const members = participants.filter((participant) => participant.role >= MEMBER && participant.enrollment !== null);
+  const enrolledMembers = members.filter((member) => member.enrollment >= 1);
   course.members = members.sort((a, b) => a.enrollment - b.enrollment);
   course.coaches = coaches;
   course.size_enrolled = enrolledMembers.length;
 };
 
 const convertToObjWithCourseIdAsKey = (courses) => {
-  let obj = {};
+  const obj = {};
 
   const toCourseUserObj = (course) => ({
     id: course.user_id,
@@ -313,9 +313,9 @@ const convertToObjWithCourseIdAsKey = (courses) => {
 };
 
 const convertToCalculatedObjWithIdsAsKey = (performances) => {
-  let obj = {};
+  const obj = {};
   for (let performance of performances) {
-    let courseId_userId = `${performance.course_id} ${performance.user_id}`;
+    const courseId_userId = `${performance.course_id} ${performance.user_id}`;
     obj[courseId_userId] = {
       name: performance.name,
       ratio: obj[courseId_userId]?.ratio ? obj[courseId_userId].ratio * performance.ratio : performance.ratio,
@@ -333,9 +333,9 @@ const convertToCalculatedObjWithIdsAsKey = (performances) => {
 
 const convertToArrWithLeaderScore = (workout_id, objWithCourseIdUserIdAsKey) => {
   return Object.keys(objWithCourseIdUserIdAsKey).map((courseId_userId) => {
-    let course_id = courseId_userId.substring(0, courseId_userId.indexOf(" "));
-    let user_id = courseId_userId.substring(courseId_userId.indexOf(" ") + 1);
-    let leader = objWithCourseIdUserIdAsKey[courseId_userId];
+    const course_id = courseId_userId.substring(0, courseId_userId.indexOf(" "));
+    const user_id = courseId_userId.substring(courseId_userId.indexOf(" ") + 1);
+    const leader = objWithCourseIdUserIdAsKey[courseId_userId];
     return {
       workout_id,
       course_id,

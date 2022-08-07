@@ -1,10 +1,10 @@
 const getCoursePoint = async (connection, course_id) => {
-  let [course_result] = await connection.query(`select point from courses where id = ?`, [course_id]);
+  const [course_result] = await connection.query(`select point from courses where id = ?`, [course_id]);
   return course_result[0].point;
 };
 
 const getAvailablePointsByUser = async (connection, user_id) => {
-  let [points_result] = await connection.query(
+  const [points_result] = await connection.query(
     ` select IFNULL(sum(point),0) - IFNULL(sum(point_to_be_deducted),0) as points_available from points where user_id = ? `,
     [user_id]
   );
@@ -12,7 +12,7 @@ const getAvailablePointsByUser = async (connection, user_id) => {
 };
 
 const isUserOnEnrollmentList = async (connection, course_id, user_id) => {
-  let [course_user_result] = await connection.query(
+  const [course_user_result] = await connection.query(
     `select * from course_user where course_id = ? and user_id = ? and enrollment >= 0`,
     [course_id, user_id]
   );
@@ -20,7 +20,7 @@ const isUserOnEnrollmentList = async (connection, course_id, user_id) => {
 };
 
 const isUserOnCourseList = async (connection, course_id, user_id) => {
-  let [course_user_result] = await connection.query(`select * from course_user where course_id = ? and user_id = ? `, [
+  const [course_user_result] = await connection.query(`select * from course_user where course_id = ? and user_id = ? `, [
     course_id,
     user_id
   ]);
@@ -28,7 +28,7 @@ const isUserOnCourseList = async (connection, course_id, user_id) => {
 };
 
 const userEnrollmentStatusOnCourse = async (connection, course_id, user_id) => {
-  let [course_user_result] = await connection.query(
+  const [course_user_result] = await connection.query(
     `select * from course_user where course_id = ? and user_id = ? and enrollment > 0`,
     [course_id, user_id]
   );
@@ -36,7 +36,7 @@ const userEnrollmentStatusOnCourse = async (connection, course_id, user_id) => {
 };
 
 const getNextUserId = async (connection, course_id, course_point) => {
-  let [next_users_result] = await connection.query(
+  const [next_users_result] = await connection.query(
     ` 
     select 
       course_user.user_id 
@@ -60,7 +60,7 @@ const getNextUserId = async (connection, course_id, course_point) => {
 };
 
 const getAvailableSpots = async (connection, course_id) => {
-  let [enrolled_result] = await connection.query(
+  const [enrolled_result] = await connection.query(
     ` 
     select count(*) as enrolled
     from course_user 
@@ -70,7 +70,7 @@ const getAvailableSpots = async (connection, course_id) => {
     [course_id]
   );
 
-  let [course_result] = await connection.query(` select size from courses where id = ? `, [course_id]);
+  const [course_result] = await connection.query(` select size from courses where id = ? `, [course_id]);
 
   return course_result[0].size - enrolled_result[0].enrolled;
 };

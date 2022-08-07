@@ -23,10 +23,10 @@ async function _createFakeUser(conn) {
 }
 
 async function _createPoint(conn) {
-  let [owner_ids] = await conn.query("select id from users where role = 2");
-  let first_owner_id = owner_ids[0].id;
+  const [owner_ids] = await conn.query("select id from users where role = 2");
+  const first_owner_id = owner_ids[0].id;
 
-  let [member_ids] = await conn.query("select id from users where role = 1");
+  const [member_ids] = await conn.query("select id from users where role = 1");
   member_ids.forEach((member) => {
     member.creator_id = first_owner_id;
     member.point = 10;
@@ -38,18 +38,17 @@ async function _createPoint(conn) {
 
 async function _createFakeCourse(conn) {
   await conn.query("INSERT INTO courses (title, size, start, end, note, point) VALUES ?", [courses.map((x) => Object.values(x))]);
-  //let [course_ids] = await conn.query("select id from courses");
 }
 
 async function _createFakeCourseUser(conn) {
-  let [course_ids] = await conn.query("select id from courses");
-  let first_course_id = course_ids[0].id;
+  const [course_ids] = await conn.query("select id from courses");
+  const first_course_id = course_ids[0].id;
 
-  let [coach_ids] = await conn.query("select id from users where role = 2");
-  let first_coach_id = coach_ids[0].id;
+  const [coach_ids] = await conn.query("select id from users where role = 2");
+  const first_coach_id = coach_ids[0].id;
 
-  let [member_ids] = await conn.query("select id from users where role = 1");
-  let first_member_id = member_ids[0].id;
+  const [member_ids] = await conn.query("select id from users where role = 1");
+  const first_member_id = member_ids[0].id;
 
   await conn.query("INSERT INTO course_user (course_id, user_id, is_coach) VALUES (?, ?, ?)", [
     first_course_id,
@@ -65,8 +64,8 @@ async function _createFakeCourseUser(conn) {
 }
 
 async function _createFakeMovement(conn) {
-  let [coach_ids] = await conn.query("select id from users where role = 2");
-  let first_coach_id = coach_ids[0].id;
+  const [coach_ids] = await conn.query("select id from users where role = 2");
+  const first_coach_id = coach_ids[0].id;
 
   movements.forEach((movement) => {
     movement.creator_id = first_coach_id;
@@ -76,8 +75,8 @@ async function _createFakeMovement(conn) {
 }
 
 async function _createFakeMovement(conn) {
-  let [coach_ids] = await conn.query("select id from users where role = 2");
-  let first_coach_id = coach_ids[0].id;
+  const [coach_ids] = await conn.query("select id from users where role = 2");
+  const first_coach_id = coach_ids[0].id;
 
   movements.forEach((movement) => (movement.creator_id = first_coach_id));
 
@@ -85,8 +84,8 @@ async function _createFakeMovement(conn) {
 }
 
 async function _createFakeWorkout(conn) {
-  let [coach_ids] = await conn.query("select id from users where role = 2");
-  let first_coach_id = coach_ids[0].id;
+  const [coach_ids] = await conn.query("select id from users where role = 2");
+  const first_coach_id = coach_ids[0].id;
 
   workouts.forEach((workout) => (workout.creator_id = first_coach_id));
 
@@ -96,10 +95,10 @@ async function _createFakeWorkout(conn) {
 }
 
 async function _createFakeWorkoutMovement(conn) {
-  let [workout_ids] = await conn.query("select id from workouts");
-  let first_workout_id = workout_ids[0].id;
+  const [workout_ids] = await conn.query("select id from workouts");
+  const first_workout_id = workout_ids[0].id;
 
-  let [movements] = await conn.query("select * from movements");
+  const [movements] = await conn.query("select * from movements");
 
   movements.forEach((movement) => {
     movement.workout_id = first_workout_id;
@@ -118,10 +117,10 @@ async function _createFakeWorkoutMovement(conn) {
 }
 
 async function _createFakeWorkoutMovement(conn) {
-  let [workout_ids] = await conn.query("select id from workouts");
-  let first_workout_id = workout_ids[0].id;
+  const [workout_ids] = await conn.query("select id from workouts");
+  const first_workout_id = workout_ids[0].id;
 
-  let [movements] = await conn.query("select * from movements");
+  const [movements] = await conn.query("select * from movements");
 
   movements.forEach((movement) => {
     movement.workout_id = first_workout_id;
@@ -140,20 +139,17 @@ async function _createFakeWorkoutMovement(conn) {
 }
 
 async function _createFakePerformance(conn) {
-  let [course_ids] = await conn.query("select id from courses");
-  let first_course_id = course_ids[0].id;
+  const [course_ids] = await conn.query("select id from courses");
+  const first_course_id = course_ids[0].id;
 
-  let [member_ids] = await conn.query("select id from users where role = 1");
-  let first_member_id = member_ids[0].id;
+  const [member_ids] = await conn.query("select id from users where role = 1");
+  const first_member_id = member_ids[0].id;
 
-  let [workouts] = await conn.query("select * from workouts");
-  let first_workout_id = workouts[0].id;
-  let first_workout_round = workouts[0].round;
-  let first_workout_extra_count = workouts[0].extra_count;
-  let first_workout_minute = workouts[0].minute;
-  let first_workout_extra_sec = workouts[0].extra_sec;
+  const [workouts] = await conn.query("select * from workouts");
+  const first_workout_id = workouts[0].id;
+ 
 
-  let [workoutMovements] = await conn.query(`select * from workout_movement where workout_id = ${first_workout_id}`);
+  const [workoutMovements] = await conn.query(`select * from workout_movement where workout_id = ${first_workout_id}`);
 
   workoutMovements.forEach((workoutMovement) => {
     workoutMovement.kg = performance.kg;

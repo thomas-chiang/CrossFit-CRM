@@ -13,7 +13,7 @@ const signUp = async (user) => {
 
 const signIn = async (role, email) => {
   const [result] = await pool.query("select * from users where role = ? and email = ? ", [role, email]);
-  let user = result[0];
+  const user = result[0];
   return { user };
 };
 
@@ -34,7 +34,7 @@ const getUserProfile = async (role, email) => {
   `,
     [role, email]
   );
-  let user = result[0];
+  const user = result[0];
   return user;
 };
 
@@ -71,22 +71,22 @@ const getCoaches = async () => {
 };
 
 const updateValidStatus = async (user_id, valid_status) => {
-  let [result] = await pool.query(` update users set valid = ? where id = ? `, [valid_status, user_id]);
+  const [result] = await pool.query(` update users set valid = ? where id = ? `, [valid_status, user_id]);
   return result;
 };
 
 const updateRole = async (user_id, role) => {
-  let [result] = await pool.query(` update users set role = ? where id = ? `, [role, user_id]);
+  const [result] = await pool.query(` update users set role = ? where id = ? `, [role, user_id]);
   return result;
 };
 
 const getVaidStatus = async (user_id) => {
-  let [result] = await pool.query(`select * from users where id = ?`, [user_id]);
+  const [result] = await pool.query(`select * from users where id = ?`, [user_id]);
   return result[0].valid;
 };
 
 const insertPoint = async (user_id, point, creator_id, time) => {
-  let [result] = await pool.query(`insert into points set ?`, [{ user_id, point, creator_id, time }]);
+  const [result] = await pool.query(`insert into points set ?`, [{ user_id, point, creator_id, time }]);
   return result;
 };
 

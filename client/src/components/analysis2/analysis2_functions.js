@@ -17,7 +17,7 @@ async function getWorkoutsWithMovements(workout_id, setWorkoutWithMovements) {
     const response = await fetch(process.env.REACT_APP_API_URL + `workout/workout/${workout_id}`);
     const data = await response.json();
     if (response.ok) setWorkoutWithMovements(data);
-    else console.log(data.error);
+    else console.log(data);
   } catch (e) {
     console.log(e);
   }
@@ -32,9 +32,9 @@ async function getMovements(setMovements) {
       item.value = item.id;
     }
     if (response.ok) setMovements(data);
-    else alert(data.error);
+    else alert(data);
   } catch (e) {
-    alert(e.message);
+    alert(e);
   }
 }
 
@@ -49,9 +49,9 @@ async function getDistinctWorkoutMovements(workout_id, setWorkoutMovements) {
     }
 
     if (response.ok) setWorkoutMovements(data);
-    else alert(data.error);
+    else alert(data);
   } catch (e) {
-    alert(e.message);
+    alert(e);
   }
 }
 
@@ -64,7 +64,7 @@ async function getUserWorkouts(user_id, setUserWorkouts) {
       item.value = item.workout_id;
     }
     if (response.ok) setUserWorkouts(data);
-    else alert(data.error);
+    else alert(data);
   } catch (e) {
     alert(e.message);
   }
@@ -77,10 +77,10 @@ async function getPerformanceByMovement(user_id, movement_id, setLineDate) {
     );
     const data = await response.json();
     if (response.ok) setLineDate(generateBarData(data));
-    else alert(data.error);
+    else alert(data);
   } catch (e) {
     console.log(e);
-    alert(e.message);
+    alert(e);
   }
 }
 
@@ -92,10 +92,10 @@ async function getPerformanceByWorkoutMovement(user_id, workout_id, movement_id,
     );
     const data = await response.json();
     if (response.ok) setLineDate(generateBarData(data));
-    else alert(data.error);
+    else alert(data);
   } catch (e) {
     console.log(e);
-    alert(e.message);
+    alert(e);
   }
 }
 
@@ -110,9 +110,9 @@ async function getUsersByRole(role_level, setCoaches) {
     }
 
     if (response.ok) setCoaches(data);
-    else alert(data.error);
+    else alert(data);
   } catch (e) {
-    alert(e.message);
+    alert(e);
   }
 }
 
@@ -147,15 +147,15 @@ async function getPerformanceByWorkout(user_id, workout_id, distinctMovements, s
       updatedDistinctMovements.unshift(round);
 
       setMovementArr(updatedDistinctMovements);
-    } else alert(data.error);
+    } else alert(data);
   } catch (e) {
     alert(e);
   }
 }
 
 function generateRoundData(data) {
-  const labels = [];
-  const datasets = [
+  let labels = [];
+  let datasets = [
     {
       label: "round",
       data: [],
@@ -179,8 +179,8 @@ function generateRoundData(data) {
 }
 
 function generateBarData(data) {
-  const labels = [];
-  const datasets = [
+  let labels = [];
+  let datasets = [
     {
       label: "kg",
       data: [],
