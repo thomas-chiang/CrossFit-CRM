@@ -15,7 +15,7 @@ export default Functions;
 async function getWorkoutsWithMovements(workout_id, setWorkoutWithMovements) {
   try {
     const response = await fetch(process.env.REACT_APP_API_URL + `workout/workout/${workout_id}`);
-    let data = await response.json();
+    const data = await response.json();
     if (response.ok) setWorkoutWithMovements(data);
     else console.log(data.error);
   } catch (e) {
@@ -26,7 +26,7 @@ async function getWorkoutsWithMovements(workout_id, setWorkoutWithMovements) {
 async function getMovements(setMovements) {
   try {
     const response = await fetch(process.env.REACT_APP_API_URL + "movement");
-    let data = await response.json();
+    const data = await response.json();
     for (let item of data) {
       item.label = item.name;
       item.value = item.id;
@@ -41,7 +41,7 @@ async function getMovements(setMovements) {
 async function getDistinctWorkoutMovements(workout_id, setWorkoutMovements) {
   try {
     const response = await fetch(process.env.REACT_APP_API_URL + `workout/distinctworkoutmovements/${workout_id}`);
-    let data = await response.json();
+    const data = await response.json();
 
     for (let item of data) {
       item.label = item.name;
@@ -58,7 +58,7 @@ async function getDistinctWorkoutMovements(workout_id, setWorkoutMovements) {
 async function getUserWorkouts(user_id, setUserWorkouts) {
   try {
     const response = await fetch(process.env.REACT_APP_API_URL + `performance/workouts/${user_id}`);
-    let data = await response.json();
+    const data = await response.json();
     for (let item of data) {
       item.label = item.name;
       item.value = item.workout_id;
@@ -75,7 +75,7 @@ async function getPerformanceByMovement(user_id, movement_id, setLineDate) {
     const response = await fetch(
       process.env.REACT_APP_API_URL + `performance/movement?user_id=${user_id}&movement_id=${movement_id}`
     );
-    let data = await response.json();
+    const data = await response.json();
     if (response.ok) setLineDate(generateBarData(data));
     else alert(data.error);
   } catch (e) {
@@ -90,7 +90,7 @@ async function getPerformanceByWorkoutMovement(user_id, workout_id, movement_id,
       process.env.REACT_APP_API_URL +
         `performance/workoutmovement?user_id=${user_id}&workout_id=${workout_id}&movement_id=${movement_id}`
     );
-    let data = await response.json();
+    const data = await response.json();
     if (response.ok) setLineDate(generateBarData(data));
     else alert(data.error);
   } catch (e) {
@@ -102,7 +102,7 @@ async function getPerformanceByWorkoutMovement(user_id, workout_id, movement_id,
 async function getUsersByRole(role_level, setCoaches) {
   try {
     const response = await fetch(process.env.REACT_APP_API_URL + `user/role/${role_level}`);
-    let data = await response.json();
+    const data = await response.json();
 
     for (let user of data) {
       user.value = user.id;
@@ -125,11 +125,11 @@ async function getPerformanceByWorkout(user_id, workout_id, distinctMovements, s
     const response = await fetch(
       process.env.REACT_APP_API_URL + `performance/analysis?${reqQuery}&user_id=${user_id}&workout_id=${workout_id}`
     );
-    let data = await response.json();
+    const data = await response.json();
 
     let minLength = data[0].length;
     let minIndex = 0;
-    let updatedDistinctMovements = [];
+    const updatedDistinctMovements = [];
     for (let movement of distinctMovements) updatedDistinctMovements.push(movement);
     if (response.ok) {
       for (let [index, movmemnt] of updatedDistinctMovements.entries()) {
@@ -139,7 +139,7 @@ async function getPerformanceByWorkout(user_id, workout_id, distinctMovements, s
         movmemnt.barData = generateBarData(data[index]);
       }
 
-      let round = {
+      const round = {
         name: "Rounds & Minutes",
         barData: generateRoundData(data[minIndex])
       };
@@ -154,8 +154,8 @@ async function getPerformanceByWorkout(user_id, workout_id, distinctMovements, s
 }
 
 function generateRoundData(data) {
-  let labels = [];
-  let datasets = [
+  const labels = [];
+  const datasets = [
     {
       label: "round",
       data: [],
@@ -174,13 +174,13 @@ function generateRoundData(data) {
     datasets[0].data.push(item.round === 0 ? null : item.round);
     datasets[1].data.push(item.minute === 0 ? null : item.minute);
   }
-  let roundData = { labels, datasets };
+  const roundData = { labels, datasets };
   return roundData;
 }
 
 function generateBarData(data) {
-  let labels = [];
-  let datasets = [
+  const labels = [];
+  const datasets = [
     {
       label: "kg",
       data: [],
@@ -214,13 +214,13 @@ function generateBarData(data) {
     if (item.cal > 0) datasets[3].data.push(item.cal === 0 ? null : item.cal);
   }
 
-  let updatedDatasets = [];
+  const updatedDatasets = [];
   for (let dataset of datasets) {
     if (dataset.data.length > 0) updatedDatasets.push(dataset);
   }
 
   datasets = updatedDatasets;
 
-  let barData = { labels, datasets };
+  const barData = { labels, datasets };
   return barData;
 }

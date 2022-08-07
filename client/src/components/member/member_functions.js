@@ -10,7 +10,7 @@ export default Functions;
 async function getUsersByRole(role_level, setCoaches) {
   try {
     const response = await fetch(process.env.REACT_APP_API_URL + `user/role/${role_level}`);
-    let data = await response.json();
+    const data = await response.json();
     if (response.ok) setCoaches(data);
     else alert(data.error);
   } catch (e) {
@@ -21,7 +21,7 @@ async function getUsersByRole(role_level, setCoaches) {
 async function updateValidStatus(user_id, valid_status, setUpdate, setAuth, setDisable, setAlert) {
   setDisable(true);
   try {
-    let token = localStorage.getItem("jwtToken");
+    const token = localStorage.getItem("jwtToken");
 
     if (!(await utilsFunctions.auth())) return setAuth(false);
 
@@ -31,7 +31,7 @@ async function updateValidStatus(user_id, valid_status, setUpdate, setAuth, setD
         Authorization: `Bearer ${token}`
       }
     });
-    let data = await response.json();
+    const data = await response.json();
     if (response.ok) {
       setAlert("updated valid status successfully");
       setUpdate(Date());
@@ -45,7 +45,7 @@ async function updateValidStatus(user_id, valid_status, setUpdate, setAuth, setD
 async function updateRole(user_id, role, setUpdate, setAuth, setDisable, setAlert) {
   setDisable(true);
   try {
-    let token = localStorage.getItem("jwtToken");
+    const token = localStorage.getItem("jwtToken");
 
     if (!(await utilsFunctions.auth())) return setAuth(false);
 
@@ -55,7 +55,7 @@ async function updateRole(user_id, role, setUpdate, setAuth, setDisable, setAler
         Authorization: `Bearer ${token}`
       }
     });
-    let data = await response.json();
+    const data = await response.json();
     if (response.ok) {
       setAlert("updated role successfully");
       setUpdate(Date());
@@ -69,7 +69,7 @@ async function updateRole(user_id, role, setUpdate, setAuth, setDisable, setAler
 async function insertPoint(user_id, point, setUpdate, setAuth, behavior, setDisable, setAlert) {
   setDisable(true);
   try {
-    let token = localStorage.getItem("jwtToken");
+    const token = localStorage.getItem("jwtToken");
 
     if (!(await utilsFunctions.auth())) return setAuth(false);
 
@@ -82,7 +82,7 @@ async function insertPoint(user_id, point, setUpdate, setAuth, behavior, setDisa
         }
       }
     );
-    let data = await response.json();
+    const data = await response.json();
     if (response.ok) {
       if (point > 0) setAlert("added point successfully");
       if (point < 0) setAlert("deducted point successfully");

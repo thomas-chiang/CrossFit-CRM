@@ -8,7 +8,7 @@ export default Functions;
 async function getCoaches(setCoaches) {
   try {
     const response = await fetch(process.env.REACT_APP_API_URL + "user/coach");
-    let data = await response.json();
+    const data = await response.json();
     if (response.ok) setCoaches(data);
     else alert(data.error);
   } catch (e) {
@@ -18,7 +18,7 @@ async function getCoaches(setCoaches) {
 
 async function updateValidStatus(user_id, valid_status, setUpdate, setAuth) {
   try {
-    let token = localStorage.getItem("jwtToken");
+    const token = localStorage.getItem("jwtToken");
 
     if (!(await utilsFunctions.auth())) return setAuth(false);
 
@@ -28,7 +28,7 @@ async function updateValidStatus(user_id, valid_status, setUpdate, setAuth) {
         Authorization: `Bearer ${token}`
       }
     });
-    let data = await response.json();
+    const data = await response.json();
     if (response.ok) {
       alert("updated valid status successfully");
       setUpdate(Date());

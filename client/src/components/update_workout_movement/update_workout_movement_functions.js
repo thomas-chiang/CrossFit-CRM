@@ -9,7 +9,7 @@ export default Functions;
 async function updateWorkoutMovement(updatedMovement, setUpdate, setPassDownUpdate, setAuth, setDisable, setAlert) {
   setDisable(true);
   try {
-    let token = localStorage.getItem("jwtToken");
+    const token = localStorage.getItem("jwtToken");
     if (!(await utilsFunctions.auth())) return setAuth(false);
 
     const response = await fetch(process.env.REACT_APP_API_URL + "workout/workoutmovement", {
@@ -20,7 +20,7 @@ async function updateWorkoutMovement(updatedMovement, setUpdate, setPassDownUpda
       },
       body: JSON.stringify(updatedMovement)
     });
-    let data = await response.json();
+    const data = await response.json();
     if (response.ok) {
       setAlert("updated successfully");
       setUpdate(Date());
@@ -37,7 +37,7 @@ async function getWorkoutMovement(setUpdatedMovement, workout_movement_id) {
   if (!workout_movement_id) return;
   try {
     const response = await fetch(process.env.REACT_APP_API_URL + `workout/workoutmovement/${workout_movement_id}`);
-    let data = await response.json();
+    const data = await response.json();
     if (response.ok) setUpdatedMovement(data);
     else console.log(data.error);
   } catch (e) {
@@ -49,7 +49,7 @@ async function getWorkoutMovement(setUpdatedMovement, workout_movement_id) {
 async function deleteWorkoutMovement(workout_movement_id, setUpdateFromChild, setPassDownUpdate, setAuth, setDisable, setAlert) {
   setDisable(true);
   try {
-    let token = localStorage.getItem("jwtToken");
+    const token = localStorage.getItem("jwtToken");
     if (!(await utilsFunctions.auth())) return setAuth(false);
 
     const response = await fetch(process.env.REACT_APP_API_URL + `workout/workoutmovement/${workout_movement_id}`, {
@@ -58,7 +58,7 @@ async function deleteWorkoutMovement(workout_movement_id, setUpdateFromChild, se
         Authorization: `Bearer ${token}`
       }
     });
-    let data = await response.json();
+    const data = await response.json();
     if (response.ok) {
       setAlert("deleted successfully");
       setPassDownUpdate(Date());

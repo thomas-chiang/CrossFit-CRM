@@ -12,11 +12,11 @@ export default Functions;
 
 async function getUser(setUser) {
   try {
-    let token = localStorage.getItem("jwtToken");
-    let response = await fetch(process.env.REACT_APP_API_URL + "token", {
+    const token = localStorage.getItem("jwtToken");
+    const response = await fetch(process.env.REACT_APP_API_URL + "token", {
       headers: { Authorization: `Bearer ${token}` }
     });
-    let data = await response.json();
+    const data = await response.json();
     if (response.ok) {
       data.value = data.id;
       data.label = data.name;
@@ -33,7 +33,7 @@ async function getUser(setUser) {
 async function getDistinctWorkoutMovements(workout_id, setWorkoutMovements) {
   try {
     const response = await fetch(process.env.REACT_APP_API_URL + `workout/distinctworkoutmovements/${workout_id}`);
-    let data = await response.json();
+    const data = await response.json();
 
     for (let item of data) {
       item.label = item.name;
@@ -52,7 +52,7 @@ async function handleEnrollButton(id, calendarContext, setAuth, setDisable, setA
   try {
     if (!(await utilsFunctions.auth())) return setAuth(false);
 
-    let token = localStorage.getItem("jwtToken"); // auth
+    const token = localStorage.getItem("jwtToken"); // auth
     const response = await fetch(process.env.REACT_APP_API_URL + `course/enrollment/${id}`, {
       method: "POST",
       headers: {
@@ -63,7 +63,7 @@ async function handleEnrollButton(id, calendarContext, setAuth, setDisable, setA
       setAlert("Enrolled successfully");
       calendarContext.setUpdate(!calendarContext.update);
     } else {
-      let data = await response.json();
+      const data = await response.json();
       setAlert(data.error);
     }
   } catch (e) {
@@ -77,7 +77,7 @@ async function handleQuitButton(id, calendarContext, setAuth, setDisable, setAle
   try {
     if (!(await utilsFunctions.auth())) return setAuth(false);
 
-    let token = localStorage.getItem("jwtToken"); // auth
+    const token = localStorage.getItem("jwtToken"); // auth
     const response = await fetch(process.env.REACT_APP_API_URL + `course/enrollment/${id}`, {
       method: "DELETE",
       headers: {
@@ -88,7 +88,7 @@ async function handleQuitButton(id, calendarContext, setAuth, setDisable, setAle
       setAlert("Quit successfully");
       calendarContext.setUpdate(!calendarContext.update);
     } else {
-      let data = await response.json();
+      const data = await response.json();
       setAlert(data.error);
       calendarContext.setUpdate(!calendarContext.update);
     }
@@ -100,15 +100,15 @@ async function handleQuitButton(id, calendarContext, setAuth, setDisable, setAle
 
 function handleCancelButton(id, calendarContext) {
   calendarContext.setUpdate(!calendarContext.update);
-  let oldArr = calendarContext.arr;
-  let newArr = oldArr.filter((item) => item.id !== id);
+  const oldArr = calendarContext.arr;
+  const newArr = oldArr.filter((item) => item.id !== id);
   calendarContext.setArr(newArr);
 }
 
 async function getWorkout(workout_id, setUpdatedWorkout) {
   try {
     const response = await fetch(process.env.REACT_APP_API_URL + `workout/workout/${workout_id}`);
-    let data = await response.json();
+    const data = await response.json();
     if (response.ok) setUpdatedWorkout(data);
     else console.log(data.error);
   } catch (e) {

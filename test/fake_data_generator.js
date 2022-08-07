@@ -38,8 +38,7 @@ async function _createPoint(conn) {
 
 async function _createFakeCourse(conn) {
   await conn.query("INSERT INTO courses (title, size, start, end, note, point) VALUES ?", [courses.map((x) => Object.values(x))]);
-  let [course_ids] = await conn.query("select id from courses");
-  await conn.query("INSERT INTO semaphore (course_id) VALUES ?", [course_ids.map((x) => Object.values(x))]);
+  //let [course_ids] = await conn.query("select id from courses");
 }
 
 async function _createFakeCourseUser(conn) {
@@ -223,7 +222,6 @@ async function truncateFakeData() {
     "movements",
     "performances",
     "points",
-    "semaphore",
     "workout_movement",
     "workouts"
   ];

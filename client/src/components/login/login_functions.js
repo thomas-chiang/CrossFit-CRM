@@ -8,7 +8,7 @@ export default Functions;
 async function handleSignUp(role, name, email, password, gender, appContext, navigate, setDisable, setAlert) {
   setDisable(true);
   try {
-    let response = await fetch(process.env.REACT_APP_API_URL + "user/signup", {
+    const response = await fetch(process.env.REACT_APP_API_URL + "user/signup", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -19,7 +19,7 @@ async function handleSignUp(role, name, email, password, gender, appContext, nav
         gender
       })
     });
-    let data = await response.json();
+    const data = await response.json();
     if (response.ok) {
       setAlert("Signed up successfully");
       localStorage.setItem("jwtToken", data.access_token);
@@ -37,7 +37,7 @@ async function handleSignUp(role, name, email, password, gender, appContext, nav
 async function handleSignIn(role, email, password, appContext, navigate, setDisable, setAlert) {
   setDisable(true);
   try {
-    let response = await fetch(process.env.REACT_APP_API_URL + "user/signin", {
+    const response = await fetch(process.env.REACT_APP_API_URL + "user/signin", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -46,7 +46,7 @@ async function handleSignIn(role, email, password, appContext, navigate, setDisa
         password
       })
     });
-    let data = await response.json();
+    const data = await response.json();
 
     if (response.ok) {
       setAlert("Signed in successfully");

@@ -10,7 +10,7 @@ export default Functions;
 async function getMovements(setMovements) {
   try {
     const response = await fetch(process.env.REACT_APP_API_URL + "movement");
-    let data = await response.json();
+    const data = await response.json();
     data.reverse();
     if (response.ok) setMovements(data);
     else alert(data.error);
@@ -22,7 +22,7 @@ async function getMovements(setMovements) {
 async function createMovement(newMovement, setUpdate, setAuth, setDisable, setAlert) {
   setDisable(true);
   try {
-    let token = localStorage.getItem("jwtToken");
+    const token = localStorage.getItem("jwtToken");
 
     if (!(await utilsFunctions.auth())) return setAuth(false);
 
@@ -34,7 +34,7 @@ async function createMovement(newMovement, setUpdate, setAuth, setDisable, setAl
       },
       body: JSON.stringify(newMovement)
     });
-    let data = await response.json();
+    const data = await response.json();
     if (response.ok) {
       setAlert("created successfully");
       setUpdate(Date());
@@ -48,7 +48,7 @@ async function createMovement(newMovement, setUpdate, setAuth, setDisable, setAl
 async function updateMovement(updateingMovement, setUpdate, setAuth, setDisable, setAlert) {
   setDisable(true);
   try {
-    let token = localStorage.getItem("jwtToken");
+    const token = localStorage.getItem("jwtToken");
 
     if (!(await utilsFunctions.auth())) return setAuth(false);
 
@@ -60,7 +60,7 @@ async function updateMovement(updateingMovement, setUpdate, setAuth, setDisable,
       },
       body: JSON.stringify(updateingMovement)
     });
-    let data = await response.json();
+    const data = await response.json();
     if (response.ok) {
       setAlert("updated successfully");
       setUpdate(Date());
@@ -74,7 +74,7 @@ async function updateMovement(updateingMovement, setUpdate, setAuth, setDisable,
 async function deleteMovement(id, setUpdate, setAuth, setDisable, setAlert) {
   setDisable(true);
   try {
-    let token = localStorage.getItem("jwtToken");
+    const token = localStorage.getItem("jwtToken");
 
     if (!(await utilsFunctions.auth())) return setAuth(false);
 
@@ -84,7 +84,7 @@ async function deleteMovement(id, setUpdate, setAuth, setDisable, setAlert) {
         Authorization: `Bearer ${token}`
       }
     });
-    let data = await response.json();
+    const data = await response.json();
     if (response.ok) {
       setAlert("deleted successfully");
       setUpdate(Date());

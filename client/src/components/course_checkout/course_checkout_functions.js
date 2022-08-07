@@ -16,7 +16,7 @@ async function removeMemberById(course_id, user_id, enrollment, setUpdate, setAu
   setDisable(true);
   try {
     if (!(await utilsFunctions.auth())) return setAuth(false);
-    let token = localStorage.getItem("jwtToken"); // auth
+    const token = localStorage.getItem("jwtToken"); // auth
     const response = await fetch(
       process.env.REACT_APP_API_URL +
         `course/removeenrollment?course_id=${course_id}&user_id=${user_id}&enrollment=${enrollment}`,
@@ -32,7 +32,7 @@ async function removeMemberById(course_id, user_id, enrollment, setUpdate, setAu
       setUpdate(Date());
       calendarContext.setUpdate(!calendarContext.update);
     } else {
-      let data = await response.json();
+      const data = await response.json();
       setAlert(data.error);
     }
   } catch (e) {
@@ -45,7 +45,7 @@ async function uncheckoutMemberById(course_id, user_id, enrollment, setUpdate, s
   setDisable(true);
   try {
     if (!(await utilsFunctions.auth())) return setAuth(false);
-    let token = localStorage.getItem("jwtToken"); // auth
+    const token = localStorage.getItem("jwtToken"); // auth
     const response = await fetch(
       process.env.REACT_APP_API_URL + `course/uncheck?course_id=${course_id}&user_id=${user_id}&enrollment=${enrollment}`,
       {
@@ -60,7 +60,7 @@ async function uncheckoutMemberById(course_id, user_id, enrollment, setUpdate, s
       setUpdate(Date());
       calendarContext.setUpdate(!calendarContext.update);
     } else {
-      let data = await response.json();
+      const data = await response.json();
       setAlert(data.error);
     }
   } catch (e) {
@@ -73,7 +73,7 @@ async function checkoutMemberById(course_id, user_id, enrollment, setUpdate, set
   setDisable(true);
   try {
     if (!(await utilsFunctions.auth())) return setAuth(false);
-    let token = localStorage.getItem("jwtToken"); // auth
+    const token = localStorage.getItem("jwtToken"); // auth
     const response = await fetch(
       process.env.REACT_APP_API_URL + `course/checkout/?course_id=${course_id}&user_id=${user_id}&enrollment=${enrollment}`,
       {
@@ -88,7 +88,7 @@ async function checkoutMemberById(course_id, user_id, enrollment, setUpdate, set
       setUpdate(Date());
       calendarContext.setUpdate(!calendarContext.update);
     } else {
-      let data = await response.json();
+      const data = await response.json();
       setAlert(data.error);
     }
   } catch (e) {
@@ -101,7 +101,7 @@ async function quitMemberById(course_id, user_id, enrollment, setUpdate, setAuth
   setDisable(true);
   try {
     if (!(await utilsFunctions.auth())) return setAuth(false);
-    let token = localStorage.getItem("jwtToken"); // auth
+    const token = localStorage.getItem("jwtToken"); // auth
     const response = await fetch(
       process.env.REACT_APP_API_URL +
         `course/enrollmentbycoach/?course_id=${course_id}&user_id=${user_id}&enrollment=${enrollment}`,
@@ -117,7 +117,7 @@ async function quitMemberById(course_id, user_id, enrollment, setUpdate, setAuth
       setUpdate(Date());
       calendarContext.setUpdate(!calendarContext.update);
     } else {
-      let data = await response.json();
+      const data = await response.json();
       setAlert(data.error);
     }
   } catch (e) {
@@ -130,7 +130,7 @@ async function enrollMemberByEmail(course_id, email, setUpdate, setAuth, calenda
   setDisable(true);
   try {
     if (!(await utilsFunctions.auth())) return setAuth(false);
-    let token = localStorage.getItem("jwtToken"); // auth
+    const token = localStorage.getItem("jwtToken"); // auth
     const response = await fetch(
       process.env.REACT_APP_API_URL + `course/enrollmentbycoach/?course_id=${course_id}&email=${email}`,
       {
@@ -145,7 +145,7 @@ async function enrollMemberByEmail(course_id, email, setUpdate, setAuth, calenda
       setUpdate(Date());
       calendarContext.setUpdate(!calendarContext.update);
     } else {
-      let data = await response.json();
+      const data = await response.json();
       setUpdate(Date());
       setAlert(data.error);
     }
@@ -159,7 +159,7 @@ async function enrollMemberByExistingUserId(course_id, user_id, setUpdate, setAu
   setDisable(true);
   try {
     if (!(await utilsFunctions.auth())) return setAuth(false);
-    let token = localStorage.getItem("jwtToken"); // auth
+    const token = localStorage.getItem("jwtToken"); // auth
     const response = await fetch(
       //process.env.REACT_APP_API_URL + `course/enrollmentbycoach/existinguser/?course_id=${course_id}&user_id=${user_id}`,
       process.env.REACT_APP_API_URL + `course/enrollmentbycoach/${user_id}?course_id=${course_id}`,
@@ -175,7 +175,7 @@ async function enrollMemberByExistingUserId(course_id, user_id, setUpdate, setAu
       setUpdate(Date());
       calendarContext.setUpdate(!calendarContext.update);
     } else {
-      let data = await response.json();
+      const data = await response.json();
       setUpdate(Date());
       setAlert(data.error);
     }
@@ -188,7 +188,7 @@ async function enrollMemberByExistingUserId(course_id, user_id, setUpdate, setAu
 async function getCourseEnrolledmembers(course_id, setMembers) {
   try {
     const response = await fetch(process.env.REACT_APP_API_URL + `course/enrolled/${course_id}`);
-    let data = await response.json();
+    const data = await response.json();
     if (response.ok) {
       setMembers(data);
     } else {
@@ -201,7 +201,7 @@ async function getCourseEnrolledmembers(course_id, setMembers) {
 
 function handleCancelButton(id, calendarContext) {
   calendarContext.setUpdate(!calendarContext.update);
-  let oldArr = calendarContext.arr;
-  let newArr = oldArr.filter((item) => item.id !== id);
+  const oldArr = calendarContext.arr;
+  const newArr = oldArr.filter((item) => item.id !== id);
   calendarContext.setArr(newArr);
 }

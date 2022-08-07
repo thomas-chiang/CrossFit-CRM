@@ -178,7 +178,7 @@ function Component({ id, role }) {
                   )}
                 </>
               )}
-              {role >= 3 ? (
+              {role >= 3 && member.checkout === 0? (
                 <Button
                   disabled={disable}
                   sx={{ ml: 1, my: 1 }}

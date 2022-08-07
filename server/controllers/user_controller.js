@@ -99,7 +99,7 @@ const updateRole = async (req, res) => {
 };
 
 const insertPoint = async (req, res) => {
-  let creator_id = req.user.id;
+  const creator_id = req.user.id;
   const { user_id, point, behavior } = req.query;
 
   if (point == 0 || (point < 0 && behavior == "add") || (point > 0 && behavior == "deduct"))

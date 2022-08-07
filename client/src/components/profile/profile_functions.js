@@ -5,11 +5,11 @@ export default Functions;
 
 async function getRole(setRole) {
   try {
-    let token = localStorage.getItem("jwtToken");
-    let response = await fetch(process.env.REACT_APP_API_URL + "token", {
+    const token = localStorage.getItem("jwtToken");
+    const response = await fetch(process.env.REACT_APP_API_URL + "token", {
       headers: { Authorization: `Bearer ${token}` }
     });
-    let data = await response.json();
+    const data = await response.json();
     if (response.ok) {
       setRole(data.role);
     } else {

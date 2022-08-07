@@ -6,11 +6,11 @@ export default Functions;
 
 async function getUserData() {
   try {
-    let token = localStorage.getItem("jwtToken");
-    let response = await fetch(process.env.REACT_APP_API_URL + "user/profile", {
+    const token = localStorage.getItem("jwtToken");
+    const response = await fetch(process.env.REACT_APP_API_URL + "user/profile", {
       headers: { Authorization: `Bearer ${token}` }
     });
-    let data = await response.json();
+    const data = await response.json();
     if (response.ok) {
       return data;
     } else {
@@ -24,11 +24,11 @@ async function getUserData() {
 
 async function auth() {
   try {
-    let token = localStorage.getItem("jwtToken");
-    let response = await fetch(process.env.REACT_APP_API_URL + "token", {
+    const token = localStorage.getItem("jwtToken");
+    const response = await fetch(process.env.REACT_APP_API_URL + "token", {
       headers: { Authorization: `Bearer ${token}` }
     });
-    let data = await response.json();
+    const data = await response.json();
     if (response.ok) {
       return true;
     } else {

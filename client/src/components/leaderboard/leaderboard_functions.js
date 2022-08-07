@@ -9,7 +9,7 @@ export default Functions;
 async function getDistinctWorkoutMovements(workout_id, setWorkoutMovements) {
   try {
     const response = await fetch(process.env.REACT_APP_API_URL + `workout/distinctworkoutmovements/${workout_id}`);
-    let data = await response.json();
+    const data = await response.json();
 
     for (let item of data) {
       item.label = item.name;
@@ -26,7 +26,7 @@ async function getDistinctWorkoutMovements(workout_id, setWorkoutMovements) {
 async function getWorkouts(setWorkouts) {
   try {
     const response = await fetch(process.env.REACT_APP_API_URL + "workout/");
-    let data = await response.json();
+    const data = await response.json();
     if (response.ok) setWorkouts(data);
     else console.log(data.error);
   } catch (e) {
@@ -43,9 +43,9 @@ async function getLeaderboardByWorkouts(selectedWorkouts, setLeaderboards) {
     }
 
     const response = await fetch(process.env.REACT_APP_API_URL + `performance/leaderboard/workout?${reqQuery}`);
-    let data = await response.json();
+    const data = await response.json();
 
-    let arr = [];
+    const arr = [];
     for (let item of data) {
       arr.push({
         ...generateBarData(item.leaders),
@@ -63,7 +63,7 @@ async function getLeaderboardByWorkouts(selectedWorkouts, setLeaderboards) {
 async function getWorkout(workout_id, setUpdatedWorkout) {
   try {
     const response = await fetch(process.env.REACT_APP_API_URL + `workout/workout/${workout_id}`);
-    let data = await response.json();
+    const data = await response.json();
     if (response.ok) setUpdatedWorkout(data);
     else console.log(data.error);
   } catch (e) {
@@ -72,8 +72,8 @@ async function getWorkout(workout_id, setUpdatedWorkout) {
 }
 
 function generateBarData(data) {
-  let labels = [];
-  let datasets = [
+  const labels = [];
+  const datasets = [
     {
       label: "score",
       data: [],
@@ -99,6 +99,6 @@ function generateBarData(data) {
     datasets[1].data.push(item.round_minute);
     datasets[2].data.push(item.other);
   }
-  let barData = { labels, datasets };
+  const barData = { labels, datasets };
   return barData;
 }

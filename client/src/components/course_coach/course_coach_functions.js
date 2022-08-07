@@ -11,7 +11,7 @@ async function handleEnrollButton(id, calendarContext, setAuth) {
   try {
     if (!(await utilsFunctions.auth())) return setAuth(false);
 
-    let token = localStorage.getItem("jwtToken"); // auth
+    const token = localStorage.getItem("jwtToken"); // auth
     const response = await fetch(process.env.REACT_APP_API_URL + `course/enrollment/${id}`, {
       method: "POST",
       headers: {
@@ -22,7 +22,7 @@ async function handleEnrollButton(id, calendarContext, setAuth) {
       alert("Enrolled successfully");
       calendarContext.setUpdate(!calendarContext.update);
     } else {
-      let data = await response.json();
+      const data = await response.json();
       alert(data.error);
     }
   } catch (e) {
@@ -34,7 +34,7 @@ async function handleQuitButton(id, calendarContext, setAuth) {
   try {
     if (!(await utilsFunctions.auth())) return setAuth(false);
 
-    let token = localStorage.getItem("jwtToken"); // auth
+    const token = localStorage.getItem("jwtToken"); // auth
     const response = await fetch(process.env.REACT_APP_API_URL + `course/enrollment/${id}`, {
       method: "DELETE",
       headers: {
@@ -45,7 +45,7 @@ async function handleQuitButton(id, calendarContext, setAuth) {
       alert("Quit successfully");
       calendarContext.setUpdate(!calendarContext.update);
     } else {
-      let data = await response.json();
+      const data = await response.json();
       alert(data.error);
     }
   } catch (e) {
@@ -55,7 +55,7 @@ async function handleQuitButton(id, calendarContext, setAuth) {
 
 function handleCancelButton(id, calendarContext) {
   calendarContext.setUpdate(!calendarContext.update);
-  let oldArr = calendarContext.arr;
-  let newArr = oldArr.filter((item) => item.id !== id);
+  const oldArr = calendarContext.arr;
+  const newArr = oldArr.filter((item) => item.id !== id);
   calendarContext.setArr(newArr);
 }

@@ -8,7 +8,7 @@ const removeMemberById = async (course_id, user_id, enrollment, creator_id) => {
     await conn.query("start transaction");
 
     // start lock
-    await conn.query("update semaphore set record = record + 1 where course_id = ?", [course_id]);
+    await conn.query("select id from courses where id = ? for update", [course_id]);
 
     // add back point_to_be_deducted if enrolled
     if (enrollment == 1) {
@@ -47,7 +47,7 @@ const uncheckoutMemberById = async (course_id, user_id, enrollment, creator_id) 
     await conn.query("start transaction");
 
     // start lock
-    await conn.query("update semaphore set record = record + 1 where course_id = ?", [course_id]);
+    await conn.query("select id from courses where id = ? for update", [course_id]);
 
     let [result] = await conn.query(`update course_user set checkout = 0 where course_id = ? and user_id = ?`, [
       course_id,
@@ -83,7 +83,7 @@ const checkoutMemberById = async (course_id, user_id, enrollment, creator_id) =>
     await conn.query("start transaction");
 
     // start lock
-    await conn.query("update semaphore set record = record + 1 where course_id = ?", [course_id]);
+    await conn.query("select id from courses where id = ? for update", [course_id]);
 
     let [result] = await conn.query(`update course_user set checkout = 1 where course_id = ? and user_id = ?`, [
       course_id,
@@ -119,7 +119,7 @@ const quitMemberById = async (course_id, user_id, enrollment, creator_id) => {
     await conn.query("start transaction");
 
     // start lock
-    await conn.query("update semaphore set record = record + 1 where course_id = ?", [course_id]);
+    await conn.query("select id from courses where id = ? for update", [course_id]);
 
     let [result] = await conn.query(`update course_user set enrollment = 0 where course_id = ? and user_id = ?`, [
       course_id,
@@ -155,7 +155,7 @@ const enrollMemberByExistingUserId = async (course_id, user_id, creator_id) => {
     await conn.query("start transaction");
 
     // start lock
-    await conn.query("update semaphore set record = record + 1 where course_id = ?", [course_id]);
+    await conn.query("select id from courses where id = ? for update", [course_id]);
 
     // check point status
     let points_available = await ModelUtils.getAvailablePointsByUser(conn, user_id);
@@ -200,7 +200,7 @@ const enrollMemberByEmail = async (course_id, email, creator_id) => {
     let user_id = user_result[0].id;
 
     // start lock
-    await conn.query("update semaphore set record = record + 1 where course_id = ?", [course_id]);
+    await conn.query("select id from courses where id = ? for update", [course_id]);
 
     // check if user on enrollment list
     if (await ModelUtils.isUserOnEnrollmentList(conn, course_id, user_id))
@@ -272,7 +272,7 @@ const quit = async (course_id, user_id) => {
     await conn.query("start transaction");
 
     // start lock
-    await conn.query("update semaphore set record = record + 1 where course_id = ?", [course_id]);
+    await conn.query("select id from courses where id = ? for update", [course_id]);
 
     // check enrollment status
     let course_user_enrollment = await ModelUtils.userEnrollmentStatusOnCourse(conn, course_id, user_id);
@@ -328,7 +328,7 @@ const enroll = async (course_id, user_id) => {
     await conn.query("start transaction");
 
     // start lock
-    await conn.query("update semaphore set record = record + 1 where course_id = ?", [course_id]);
+    await conn.query("select id from courses where id = ? for update", [course_id]);
 
     // check enrollment status
     let course_user_enrollment = await ModelUtils.userEnrollmentStatusOnCourse(conn, course_id, user_id);
@@ -400,7 +400,6 @@ const createCourse = async (course, coaches, workouts) => {
     const [result] = await conn.query("INSERT INTO courses SET ?", [course]);
 
     let course_id = result.insertId;
-    await conn.query("INSERT INTO semaphore (course_id) VALUES (?)", [course_id]);
 
     if (coaches.length > 0) {
       coaches = coaches.map((coach) => [course_id, coach.id, 1]);
@@ -430,7 +429,7 @@ const updateCourse = async (course, coaches, workouts) => {
 
     let course_id = course.id;
     // start lock
-    await conn.query("update semaphore set record = record + 1 where course_id = ?", [course_id]);
+    await conn.query("select id from courses where id = ? for update", [course_id]);
 
     // check if can update point or size
     let [original_enrolled] = await conn.query(`select * from course_user where course_id = ? and enrollment = 1`, [course_id]);

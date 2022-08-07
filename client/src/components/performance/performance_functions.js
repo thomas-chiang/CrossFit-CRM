@@ -10,7 +10,7 @@ export default Functions;
 async function getPerformanceWithMovementWorkoutName(performance, setUpdatedPerformance) {
   try {
     const response = await fetch(process.env.REACT_APP_API_URL + `performance/movementworkoutname/${performance.id}`);
-    let data = await response.json();
+    const data = await response.json();
     if (response.ok) setUpdatedPerformance(data);
     else alert(data.error);
   } catch (e) {
@@ -23,7 +23,7 @@ async function deletePerformance(performance, setAuth, setUpdate, setDisable, se
   try {
     if (!(await utilsFunctions.auth())) return setAuth(false);
 
-    let token = localStorage.getItem("jwtToken"); // auth
+    const token = localStorage.getItem("jwtToken"); // auth
     const response = await fetch(process.env.REACT_APP_API_URL + "performance", {
       method: "DELETE",
       headers: {
@@ -36,7 +36,7 @@ async function deletePerformance(performance, setAuth, setUpdate, setDisable, se
       setUpdate(Date());
       setAlert("Deleted successfully");
     } else {
-      let data = await response.json();
+      const data = await response.json();
       setAlert(data.error);
     }
   } catch (e) {
@@ -51,7 +51,7 @@ async function updatePerformance(performance, setAuth, setUpdate, setDisable, se
   try {
     if (!(await utilsFunctions.auth())) return setAuth(false);
 
-    let token = localStorage.getItem("jwtToken"); // auth
+    const token = localStorage.getItem("jwtToken"); // auth
     const response = await fetch(process.env.REACT_APP_API_URL + "performance", {
       method: "PUT",
       headers: {
@@ -64,7 +64,7 @@ async function updatePerformance(performance, setAuth, setUpdate, setDisable, se
       setUpdate(Date());
       setAlert("Updated successfully");
     } else {
-      let data = await response.json();
+      const data = await response.json();
       setAlert(data.error);
     }
   } catch (e) {

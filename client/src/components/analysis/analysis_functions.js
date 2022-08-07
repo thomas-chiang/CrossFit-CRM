@@ -13,7 +13,7 @@ export default Functions;
 async function getMovements(setMovements) {
   try {
     const response = await fetch(process.env.REACT_APP_API_URL + "movement");
-    let data = await response.json();
+    const data = await response.json();
     for (let item of data) {
       item.label = item.name;
       item.value = item.id;
@@ -28,7 +28,7 @@ async function getMovements(setMovements) {
 async function getDistinctWorkoutMovements(workout_id, setWorkoutMovements) {
   try {
     const response = await fetch(process.env.REACT_APP_API_URL + `workout/distinctworkoutmovements/${workout_id}`);
-    let data = await response.json();
+    const data = await response.json();
 
     for (let item of data) {
       item.label = item.name;
@@ -45,7 +45,7 @@ async function getDistinctWorkoutMovements(workout_id, setWorkoutMovements) {
 async function getUserWorkouts(user_id, setUserWorkouts) {
   try {
     const response = await fetch(process.env.REACT_APP_API_URL + `performance/workouts/${user_id}`);
-    let data = await response.json();
+    const data = await response.json();
     for (let item of data) {
       item.label = item.name;
       item.value = item.workout_id;
@@ -62,7 +62,7 @@ async function getPerformanceByMovement(user_id, movement_id, setLineDate) {
     const response = await fetch(
       process.env.REACT_APP_API_URL + `performance/movement?user_id=${user_id}&movement_id=${movement_id}`
     );
-    let data = await response.json();
+    const data = await response.json();
     if (response.ok) setLineDate(generateLineData(data));
     else alert(data.error);
   } catch (e) {
@@ -77,7 +77,7 @@ async function getPerformanceByWorkoutMovement(user_id, workout_id, movement_id,
       process.env.REACT_APP_API_URL +
         `performance/workoutmovement?user_id=${user_id}&workout_id=${workout_id}&movement_id=${movement_id}`
     );
-    let data = await response.json();
+    const data = await response.json();
     if (response.ok) setLineDate(generateLineData(data));
     else alert(data.error);
   } catch (e) {
@@ -89,7 +89,7 @@ async function getPerformanceByWorkoutMovement(user_id, workout_id, movement_id,
 async function getUsersByRole(role_level, setCoaches) {
   try {
     const response = await fetch(process.env.REACT_APP_API_URL + `user/role/${role_level}`);
-    let data = await response.json();
+    const data = await response.json();
 
     for (let user of data) {
       user.value = user.id;
@@ -104,8 +104,8 @@ async function getUsersByRole(role_level, setCoaches) {
 }
 
 function generateLineData(data) {
-  let labels = [];
-  let datasets = [
+  const labels = [];
+  const datasets = [
     {
       label: "kg",
       data: [],
@@ -153,6 +153,6 @@ function generateLineData(data) {
     datasets[4].data.push(item.round === 0 ? null : item.round);
     datasets[5].data.push(item.minute === 0 ? null : item.minute);
   }
-  let lineData = { labels, datasets };
+  const lineData = { labels, datasets };
   return lineData;
 }

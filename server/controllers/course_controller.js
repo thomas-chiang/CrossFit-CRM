@@ -7,21 +7,21 @@ const mailUtil = require("../../utils/mail_util");
 const { EMAIL_SENDER, DOMAIN_NAME } = process.env;
 
 const removeMemberById = async (req, res) => {
-  let creator_id = req.user.id;
+  const creator_id = req.user.id;
   const { user_id, course_id, enrollment } = req.query;
   let result = await Course.removeMemberById(course_id, user_id, enrollment, creator_id);
   res.json(result);
 };
 
 const uncheckoutMemberById = async (req, res) => {
-  let creator_id = req.user.id;
+  const creator_id = req.user.id;
   const { user_id, course_id, enrollment } = req.query;
   let result = await Course.uncheckoutMemberById(course_id, user_id, enrollment, creator_id);
   res.json(result);
 };
 
 const checkoutMemberById = async (req, res) => {
-  let creator_id = req.user.id;
+  const creator_id = req.user.id;
   const { user_id, course_id, enrollment } = req.query;
   if (enrollment != 1) return res.status(400).json({ error: "Must first enroll the user into the course before checking out" });
   let result = await Course.checkoutMemberById(course_id, user_id, enrollment, creator_id);
@@ -29,7 +29,7 @@ const checkoutMemberById = async (req, res) => {
 };
 
 const quitMemberById = async (req, res) => {
-  let creator_id = req.user.id;
+  const creator_id = req.user.id;
   const { user_id, course_id, enrollment } = req.query;
   if (enrollment != 1) return res.status(400).json({ error: "Must first enroll the user into the course before quiting" });
   let result = await Course.quitMemberById(course_id, user_id, enrollment, creator_id);
@@ -37,7 +37,7 @@ const quitMemberById = async (req, res) => {
 };
 
 const enrollMemberByExistingUserId = async (req, res) => {
-  let creator_id = req.user.id;
+  const creator_id = req.user.id;
   const user_id = req.params.user_id;
   const { course_id } = req.query;
   let result = await Course.enrollMemberByExistingUserId(course_id, user_id, creator_id);
@@ -45,7 +45,7 @@ const enrollMemberByExistingUserId = async (req, res) => {
 };
 
 const enrollMemberByEmail = async (req, res) => {
-  let creator_id = req.user.id;
+  const creator_id = req.user.id;
   const { email, course_id } = req.query;
   if (!email) return res.status(400).json({ error: "Email is required." });
   if (!validator.isEmail(email)) return res.status(400).json({ error: "Invalid email format" });

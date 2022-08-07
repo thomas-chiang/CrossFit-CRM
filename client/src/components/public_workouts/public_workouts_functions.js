@@ -9,7 +9,7 @@ export default Functions;
 async function getMovementOptions(setMovements) {
   try {
     const response = await fetch(process.env.REACT_APP_API_URL + "movement");
-    let data = await response.json();
+    const data = await response.json();
     if (response.ok) setMovements(data);
     else alert(data.error);
   } catch (e) {
@@ -21,7 +21,7 @@ async function getMovementOptions(setMovements) {
 async function getWorkoutsWithMovements(setWorkouts) {
   try {
     const response = await fetch(process.env.REACT_APP_API_URL + "workout/movement");
-    let data = await response.json();
+    const data = await response.json();
     data.reverse();
     if (response.ok) setWorkouts(data);
     else alert(data.error);
@@ -33,7 +33,7 @@ async function getWorkoutsWithMovements(setWorkouts) {
 async function createWorkout(newWorkout, movementArr, setUpdate, setAuth, setDisable, setAlert) {
   setDisable(true);
   try {
-    let token = localStorage.getItem("jwtToken");
+    const token = localStorage.getItem("jwtToken");
 
     if (!(await utilsFunctions.auth())) return setAuth(false);
 
@@ -46,7 +46,7 @@ async function createWorkout(newWorkout, movementArr, setUpdate, setAuth, setDis
       },
       body: JSON.stringify(newWorkout)
     });
-    let data = await response.json();
+    const data = await response.json();
     if (response.ok) {
       setAlert("created successfully");
       setUpdate(Date());

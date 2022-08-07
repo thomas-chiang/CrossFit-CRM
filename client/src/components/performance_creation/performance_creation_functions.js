@@ -8,7 +8,7 @@ export default Functions;
 async function getWorkoutMovements(workout_id, setMovements) {
   try {
     const response = await fetch(process.env.REACT_APP_API_URL + `workout/workoutmovements/${workout_id}`);
-    let data = await response.json();
+    const data = await response.json();
     if (response.ok) setMovements(data);
     else alert(data.error);
   } catch (e) {
@@ -21,7 +21,7 @@ async function createPerformance(performance, setAuth, setUpdate, setDisable, se
   try {
     if (!(await utilsFunctions.auth())) return setAuth(false);
 
-    let token = localStorage.getItem("jwtToken"); // auth
+    const token = localStorage.getItem("jwtToken"); // auth
     const response = await fetch(process.env.REACT_APP_API_URL + "performance", {
       method: "POST",
       headers: {
@@ -34,7 +34,7 @@ async function createPerformance(performance, setAuth, setUpdate, setDisable, se
       setUpdate(Date());
       setAlert("created successfully");
     } else {
-      let data = await response.json();
+      const data = await response.json();
       setAlert(data.error);
     }
   } catch (e) {

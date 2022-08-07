@@ -7,11 +7,11 @@ export default Functions;
 
 async function getUserProfile(setUser, setAuth, appContext) {
   try {
-    let token = localStorage.getItem("jwtToken");
-    let response = await fetch(process.env.REACT_APP_API_URL + "user/profile", {
+    const token = localStorage.getItem("jwtToken");
+    const response = await fetch(process.env.REACT_APP_API_URL + "user/profile", {
       headers: { Authorization: `Bearer ${token}` }
     });
-    let data = await response.json();
+    const data = await response.json();
     if (response.ok) {
       setUser(data);
     } else {
@@ -33,11 +33,11 @@ function logout(setLogout, appContext) {
 
 async function getOwnedGyms(setOwnedGyms) {
   try {
-    let token = localStorage.getItem("jwtToken");
-    let response = await fetch(process.env.REACT_APP_API_URL + "gym/owned", {
+    const token = localStorage.getItem("jwtToken");
+    const response = await fetch(process.env.REACT_APP_API_URL + "gym/owned", {
       headers: { Authorization: `Bearer ${token}` }
     });
-    let data = await response.json();
+    const data = await response.json();
     if (response.ok) setOwnedGyms(data);
     else console.log(data.error);
   } catch (e) {

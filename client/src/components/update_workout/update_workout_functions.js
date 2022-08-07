@@ -10,7 +10,7 @@ export default Functions;
 async function deleteWorkout(workout_id, setAuth, setPassDownUpdate, setDisable, setAlert) {
   setDisable(true);
   try {
-    let token = localStorage.getItem("jwtToken");
+    const token = localStorage.getItem("jwtToken");
     if (!(await utilsFunctions.auth())) return setAuth(false);
 
     const response = await fetch(process.env.REACT_APP_API_URL + `workout/workout/${workout_id}`, {
@@ -19,7 +19,7 @@ async function deleteWorkout(workout_id, setAuth, setPassDownUpdate, setDisable,
         Authorization: `Bearer ${token}`
       }
     });
-    let data = await response.json();
+    const data = await response.json();
     if (response.ok) {
       setAlert("deleted successfully");
       setPassDownUpdate(Date());
@@ -34,7 +34,7 @@ async function deleteWorkout(workout_id, setAuth, setPassDownUpdate, setDisable,
 async function getWorkout(workout_id, setUpdatedWorkout) {
   try {
     const response = await fetch(process.env.REACT_APP_API_URL + `workout/workout/${workout_id}`);
-    let data = await response.json();
+    const data = await response.json();
     if (response.ok) setUpdatedWorkout(data);
     else console.log(data.error);
   } catch (e) {
@@ -45,7 +45,7 @@ async function getWorkout(workout_id, setUpdatedWorkout) {
 async function addWorkoutMovement(newWorkoutMovement, setAuth, setUpdate, setPassDownUpdate, setDisable, setAlert) {
   setDisable(true);
   try {
-    let token = localStorage.getItem("jwtToken");
+    const token = localStorage.getItem("jwtToken");
     if (!(await utilsFunctions.auth())) return setAuth(false);
 
     const response = await fetch(process.env.REACT_APP_API_URL + "workout/addmovement", {
@@ -56,7 +56,7 @@ async function addWorkoutMovement(newWorkoutMovement, setAuth, setUpdate, setPas
       },
       body: JSON.stringify(newWorkoutMovement)
     });
-    let data = await response.json();
+    const data = await response.json();
     if (response.ok) {
       setAlert("added successfully");
       setUpdate(Date());
@@ -72,7 +72,7 @@ async function addWorkoutMovement(newWorkoutMovement, setAuth, setUpdate, setPas
 async function updateOnlyWorkout(updatedWorkout, setAuth, setUpdate, setPassDownUpdate, setDisable, setAlert) {
   setDisable(true);
   try {
-    let token = localStorage.getItem("jwtToken");
+    const token = localStorage.getItem("jwtToken");
     if (!(await utilsFunctions.auth())) return setAuth(false);
 
     const response = await fetch(process.env.REACT_APP_API_URL + "workout/onlyworkout", {
@@ -83,7 +83,7 @@ async function updateOnlyWorkout(updatedWorkout, setAuth, setUpdate, setPassDown
       },
       body: JSON.stringify(updatedWorkout)
     });
-    let data = await response.json();
+    const data = await response.json();
     if (response.ok) {
       setAlert("updated successfully");
       setUpdate(Date());

@@ -24,7 +24,7 @@ function Component() {
   }, [calendarEvents]);
 
   function eventSetter(arg) {
-    let obj = {
+    const obj = {
       id: arg.event.id,
       title: arg.event.title,
       start: arg.event.startStr,
@@ -40,7 +40,7 @@ function Component() {
       size_enrolled: arg.event.extendedProps.size_enrolled,
       point: arg.event.extendedProps.point
     };
-    let index = arr.findIndex((item) => item.id == arg.event.id);
+    const index = arr.findIndex((item) => item.id == arg.event.id);
     if (index !== -1) {
       arr[index] = obj;
       setArr([...arr]); //must deep copy

@@ -19,7 +19,7 @@ function Component() {
     };
   }, [change]);
 
-  let typographyStyle = {
+  const typographyStyle = {
     textAlign: "center",
     p: 1,
     flexGrow: 1,
@@ -28,7 +28,7 @@ function Component() {
     justifyContent: "center"
   };
 
-  let cardStyle = {
+  const cardStyle = {
     position: "relative",
     backgroundColor: "rgb(40,40,40)",
     color: "white",

@@ -6,11 +6,11 @@ export default Functions;
 
 async function getLeader(member, setPerformances, originalMovements) {
   try {
-    let response = await fetch(
+    const response = await fetch(
       process.env.REACT_APP_API_URL +
         `performance/leaderboard/leader/?course_id=${member.course_id}&user_id=${member.user_id}&workout_id=${member.workout_id}`
     );
-    let data = await response.json();
+    const data = await response.json();
     for (const [index, value] of data.entries()) {
       data[index].original_kg = originalMovements[index].kg;
       data[index].original_rep = originalMovements[index].rep;

@@ -22,12 +22,12 @@ function Component() {
   }, [update]);
 
   function handleSelect(arg) {
-    let obj = {
+    const obj = {
       id: arg.startStr + arg.endStr,
       start: arg.startStr,
       end: arg.endStr
     };
-    let index = arr.findIndex((item) => item.id == arg.startStr + arg.endStr);
+    const index = arr.findIndex((item) => item.id == arg.startStr + arg.endStr);
     if (index !== -1) {
       arr[index] = obj;
       setArr([...arr]); //must deep copy
@@ -44,7 +44,7 @@ function Component() {
     );
   }
 
-  let contextValue = {
+  const contextValue = {
     newCalendarEvent,
     setNewCalendarEvent,
     update,
